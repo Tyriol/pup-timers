@@ -315,6 +315,6 @@ The project follows a infrastructure-first approach:
 
 ### Contact Information
 
-- **Project Lead**: [Your Name]
-- **Repository**: [GitHub Repository URL]
-- **Documentation**: [Project Wiki/Docs URL]
+- **Project Lead**: Ryan Smith
+- **Repository**: [Pup Timers](https://github.com/Tyriol/pup-timer)
+- **Documentation**: Coming soon
