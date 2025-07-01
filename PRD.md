@@ -50,7 +50,6 @@ The Dog Timer Tracker is a mobile-first Progressive Web App (PWA) designed to he
 #### Timer Management
 
 - **Count-up Timers**: Track elapsed time since an event
-
   - Last toilet break (wee/poo)
   - Time left alone at home
   - Time since last walk
