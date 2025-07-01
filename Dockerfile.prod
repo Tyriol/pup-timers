@@ -4,9 +4,7 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN --mount=type=cache,target=/root/.npm npm install --production
-
-RUN --mount=type=cache,target=/root/.npm npm install typescript --save-dev
+RUN --mount=type=cache,target=/root/.npm npm install --production && npm install typescript --save-dev
 
 COPY . .
 
