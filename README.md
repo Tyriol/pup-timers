@@ -1,69 +1,79 @@
-# React + TypeScript + Vite
+# Pup Timers 🐕
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Do you own a dog? Do you ever find yourself wondering "When did I last let him out?" or "Is he due his tick and flea tablet?"?
 
-Currently, two official plugins are available:
+Maybe you don't...but I do...all the time. And I even consider myself a pretty good dog dad.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+And so I'm creating this app, to be able to hit a button and reset a timer when I let him out for a wee. Or reset a countdown when I give him a tablet, or take him for a check-up.
 
-## Expanding the ESLint configuration
+## Getting started:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Getting started with this app is simple!
 
-```js
-export default tseslint.config([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
+Clone the repo down from
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
+```
+https://github.com/Tyriol/pup-timer.git
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Now you have a few options. You can either:
 
-```js
-// eslint.config.js
-import reactX from "eslint-plugin-react-x";
-import reactDom from "eslint-plugin-react-dom";
-
-export default tseslint.config([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs["recommended-typescript"],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
 ```
+npm install
+npm run dev
+```
+
+This will start up a regular Vite app on port `5173`
+
+Or if you've got Docker installed you can build and run containers as I've set up the code to allow this.
+
+The easiest way is to use the following command:
+
+```
+docker compose up -d
+```
+
+🐋 You can then access the app on port `3000` 🐋
+
+The -d flag will run this in detached mode, so you can continue using the terminal window.
+
+The container is setup to allow for hot reloading so you don't have to build a new image to see your changes.
+
+## Dev Workflow
+
+### Current
+
+- Create a branch for new work
+- Use Docker with `docker compose up -d` for containerized development
+- Hot reloading is enabled for both local and Docker workflows
+- Manually lint and check formatting
+- Create a PR which gets reviewed by copilot
+- Merge work into main
+
+### Planned
+
+- Automated linting and formatting (ESLint, Prettier)
+- CI/CD pipeline with GitHub Actions
+- Automated unit and integration tests (Vitest, Testing Library)
+- End-to-end tests (Cypress)
+
+## Features
+
+### Current
+
+- None as I'm busy setting up the dev environment, testing and CI/CD
+
+### Planned
+
+- Ability to download and install app, and use offline.
+- Ability to add a countup timer for dog activities like toilet breaks.
+- Ability to add countdown timers for activities like nail cuts
+
+### Future
+
+- Add additional dogs
+- Push notifications for specific timers
+
+## License
+
+I'm not currently offering a license as I want to work on this on my own, but this may change in the future
