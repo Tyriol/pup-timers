@@ -47,7 +47,7 @@ The container is setup to allow for hot reloading so you don't have to build a n
 - Use Docker with `docker compose up -d` for containerized development
 - Hot reloading is enabled for both local and Docker workflows
 - Manually lint and check formatting
-- Create a PR which get's reviewed by copilot
+- Create a PR which gets reviewed by copilot
 - Merge work into main
 
 ### Planned
@@ -74,6 +74,6 @@ The container is setup to allow for hot reloading so you don't have to build a n
 - Add additional dogs
 - Push notifications for specific timers
 
-## Licence
+## License
 
-I'm not currently offering a licence as I want to work on this on my own, but this may change in the future
+I'm not currently offering a license as I want to work on this on my own, but this may change in the future
