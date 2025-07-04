@@ -10,7 +10,8 @@
     "format": "prettier --write .",
     "preview": "vite preview",
     "prepare": "husky",
-    "test:unit": "vitest --root src/"
+    "test:unit": "vitest --root src/",
+    "test:e2e": "cypress run --browser chrome"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.11",
