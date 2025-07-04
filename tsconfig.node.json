@@ -21,5 +21,12 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["vite.config.ts", "setupTests.ts"]
+  "include": [
+    "vite.config.ts",
+    "setupTests.ts",
+    "cypress.config.mjs",
+    "cypress/**/*.ts"
+  ]
 }
+
+// TODO: Split test files into their own tsconfig.tests.json
