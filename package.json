@@ -10,7 +10,9 @@
     "format": "prettier --write .",
     "preview": "vite preview",
     "prepare": "husky",
-    "test:unit": "vitest --root src/"
+    "test:unit": "vitest --root src/",
+    "test:e2e": "cypress run --browser chrome",
+    "test:e2e:open": "cypress open"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.11",
@@ -25,6 +27,7 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.5.2",
+    "cypress": "^14.5.1",
     "eslint": "^9.29.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
