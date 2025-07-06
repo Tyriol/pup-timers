@@ -1,5 +1,7 @@
 # Pup Timers 🐕
 
+[![codecov](https://codecov.io/github/Tyriol/pup-timer/graph/badge.svg?token=L7YH74KHNV)](https://codecov.io/github/Tyriol/pup-timer)
+
 Do you own a dog? Do you ever find yourself wondering "When did I last let him out?" or "Is he due his tick and flea tablet?"?
 
 Maybe you don't...but I do...all the time. And I even consider myself a pretty good dog dad.
@@ -41,21 +43,48 @@ The container is setup to allow for hot reloading so you don't have to build a n
 
 ## Dev Workflow
 
-### Current
+### Local
 
-- Create a branch for new work
-- Use Docker with `docker compose up -d` for containerized development
-- Hot reloading is enabled for both local and Docker workflows
-- Manually lint and check formatting
-- Create a PR which gets reviewed by copilot
-- Merge work into main
+- Create an issue in Github Issues for new work.
+- Create a new branch linked to that issue and check it out locally.
+- Use Docker with `docker compose up -d` for containerized development.
+- Hot reloading is enabled for both local and Docker workflows.
+- On commit Husky will trigger and run automated linting, formatting and unit testing, preventing the commit if any of those checks fail.
+- Create a PR which gets reviewed by GitHub Copilot.
+- A CI workflow will be triggered. This checks:
+  - Linting.
+  - Formatting.
+  - Unit testing via Vitest.
+    - This also uploads test coverage to CodeCov.
+  - E2E testing via Cypress.
+- Merge work into the main branch once all checks have completed and any review feedback has been addressed.
+- CI will be triggered to build and upload a new Docker image to Docker Hub.
 
-### Planned
+### Testing
 
-- Automated linting and formatting (ESLint, Prettier)
-- CI/CD pipeline with GitHub Actions
-- Automated unit and integration tests (Vitest, Testing Library)
-- End-to-end tests (Cypress)
+If you would like to run tests while working on a piece rather than needing to commit or have the CI do it on PR, you can run the following scripts:
+
+```
+npm run test:unit
+```
+
+This will run all unit tests using Vitest and React testing library
+
+```
+npm run test:e2e
+
+or
+
+npm run test:e2e:open
+```
+
+These commands will run the Cypress end-to-end tests. The second command will open the Cypress UI so you can run them that way rather than in the CLI
+
+```
+npm run test:coverage
+```
+
+This will generate coverage reports, however I'd recommend leaving this to the CI workflow as it's best integrated with CodeCov
 
 ## Features
 
