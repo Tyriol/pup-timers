@@ -45,12 +45,12 @@ The container is setup to allow for hot reloading so you don't have to build a n
 
 ### Local
 
-- Create an issue in Github issues for new work.
+- Create an issue in Github Issues for new work.
 - Create a new branch linked to that issue and check it out locally.
 - Use Docker with `docker compose up -d` for containerized development.
 - Hot reloading is enabled for both local and Docker workflows.
 - On commit Husky will trigger and run automated linting, formatting and unit testing, preventing the commit if any of those checks fail.
-- Create a PR which gets reviewed by copilot.
+- Create a PR which gets reviewed by GitHub Copilot.
 - A CI workflow will be triggered. This checks:
   - Linting.
   - Formatting.
