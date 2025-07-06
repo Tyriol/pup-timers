@@ -9,6 +9,7 @@ lerna-debug.log*
 
 node_modules
 screenshots
+coverage
 dist
 dist-ssr
 *.local
