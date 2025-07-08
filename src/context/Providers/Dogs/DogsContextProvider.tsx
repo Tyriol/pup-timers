@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react";
-import { DogsContext } from "../Context";
-import type { Dog } from "../../types/types";
+import { DogsContext } from "../../Context";
+import type { Dog } from "../../../types/types";
 
 interface DogsProviderProps {
   children: ReactNode;

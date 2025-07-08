@@ -1,8 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import { useContext } from "react";
-import { TimersContext } from "../context/Context";
-import { TimersProvider } from "../context/Providers/TimersContextProvider";
-import type { Timer } from "../types/types";
+import { TimersContext } from "../../Context";
+import { TimersProvider } from "./TimersContextProvider";
+import type { Timer } from "../../../types/types";
 import { describe, it, expect } from "vitest";
 
 describe("Timers Context", () => {

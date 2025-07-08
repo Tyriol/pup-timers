@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react";
-import { TimersContext } from "../Context";
-import type { Timer } from "../../types/types";
+import { TimersContext } from "../../Context";
+import type { Timer } from "../../../types/types";
 
 interface TimersProviderProps {
   children: ReactNode;
