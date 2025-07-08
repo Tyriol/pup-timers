@@ -13,9 +13,16 @@ export const DogsProvider = ({ children }: DogsProviderProps) => {
     setDogsList((prevDogs) => [...prevDogs, newDog]);
   };
 
+  const updateDog = (updatedDog: Dog) => {
+    setDogsList((prevDogs) =>
+      prevDogs.map((dog) => (dog.id === updatedDog.id ? updatedDog : dog)),
+    );
+  };
+
   const value = {
     dogsList,
     addDog,
+    updateDog,
   };
 
   return <DogsContext.Provider value={value}>{children}</DogsContext.Provider>;
