@@ -13,9 +13,18 @@ export const TimersProvider = ({ children }: TimersProviderProps) => {
     setTimersList((prevTimers) => [...prevTimers, newTimer]);
   };
 
+  const updateTimer = (updatedTimer: Timer) => {
+    setTimersList((prevTimers) =>
+      prevTimers.map((timer) =>
+        timer.id === updatedTimer.id ? updatedTimer : timer,
+      ),
+    );
+  };
+
   const value = {
     timersList,
     addTimer,
+    updateTimer,
   };
 
   return (
