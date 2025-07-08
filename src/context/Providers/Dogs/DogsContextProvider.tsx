@@ -6,7 +6,7 @@ interface DogsProviderProps {
   children: ReactNode;
 }
 
-export const TimersProvider = ({ children }: DogsProviderProps) => {
+export const DogsProvider = ({ children }: DogsProviderProps) => {
   const [dogsList, setDogsList] = useState<Dog[]>([]);
 
   const addDog = (newDog: Dog) => {
