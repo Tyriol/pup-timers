@@ -21,10 +21,15 @@ export const TimersProvider = ({ children }: TimersProviderProps) => {
     );
   };
 
+  const deleteTimer = (id: string) => {
+    setTimersList((prevTimers) => prevTimers.filter((timer) => timer.id != id));
+  };
+
   const value = {
     timersList,
     addTimer,
     updateTimer,
+    deleteTimer,
   };
 
   return (
