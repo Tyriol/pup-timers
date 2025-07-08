@@ -7,7 +7,7 @@ interface TimersContextValue {
 }
 
 interface DogsContextValue {
-  dogList: Dog[];
+  dogsList: Dog[];
   addDog: (dog: Dog) => void;
 }
 
