@@ -123,4 +123,55 @@ describe("Dogs Context", () => {
     const dogAgeAfter = screen.getByTestId("dogs-age").textContent;
     expect(dogAgeAfter).toBe("4");
   });
+
+  it("deletes a dog from the dog array", async () => {
+    const TestDogComponent = () => {
+      const { dogsList, addDog, deleteDog } = useContext(DogsContext) as {
+        dogsList: Dog[];
+        addDog: (newDog: Dog) => void;
+        deleteDog: (id: string) => void;
+      };
+
+      const newDog = {
+        id: "1",
+        name: "Buddy",
+        age: 3,
+        breed: "Golden Retriever",
+      };
+
+      return (
+        <>
+          <button data-testid="add-dog-button" onClick={() => addDog(newDog)}>
+            Add new Dog
+          </button>
+          <div data-testid="dogs-count">{dogsList.length}</div>
+          <button
+            data-testid="delete-dog-button"
+            onClick={() => deleteDog("1")}
+          >
+            Delete Dog
+          </button>
+        </>
+      );
+    };
+
+    render(
+      <DogsProvider>
+        <TestDogComponent />
+      </DogsProvider>,
+    );
+
+    const addDogButton = screen.getByTestId("add-dog-button");
+    const deleteDogButton = screen.getByTestId("delete-dog-button");
+
+    await userEvent.click(addDogButton);
+
+    const dogCountBefore = screen.getByTestId("dogs-count").textContent;
+    expect(dogCountBefore).toBe("1");
+
+    await userEvent.click(deleteDogButton);
+
+    const dogCountAfter = screen.getByTestId("dogs-count").textContent;
+    expect(dogCountAfter).toBe("0");
+  });
 });

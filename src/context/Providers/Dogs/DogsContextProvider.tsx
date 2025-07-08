@@ -19,10 +19,15 @@ export const DogsProvider = ({ children }: DogsProviderProps) => {
     );
   };
 
+  const deleteDog = (id: string) => {
+    setDogsList((prevDogs) => prevDogs.filter((dog) => dog.id != id));
+  };
+
   const value = {
     dogsList,
     addDog,
     updateDog,
+    deleteDog,
   };
 
   return <DogsContext.Provider value={value}>{children}</DogsContext.Provider>;
