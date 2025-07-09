@@ -20,7 +20,7 @@ export const DogsProvider = ({ children }: DogsProviderProps) => {
   };
 
   const deleteDog = (id: string) => {
-    setDogsList((prevDogs) => prevDogs.filter((dog) => dog.id != id));
+    setDogsList((prevDogs) => prevDogs.filter((dog) => dog.id !== id));
   };
 
   const value = {
