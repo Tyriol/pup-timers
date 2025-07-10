@@ -1,6 +1,6 @@
 export interface Timer {
   type: "countdown" | "stopwatch";
-  id: string;
+  id?: string; // optional id as it will be auto-generated on creation
   name: string;
   duration: number;
   elapsed: number;
