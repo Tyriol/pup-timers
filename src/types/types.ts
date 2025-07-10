@@ -10,7 +10,7 @@ export interface Timer {
 }
 
 export interface Dog {
-  id: string;
+  id?: string; // optional id as it will be auto-generated on creation
   name: string;
   age: number;
   breed: string;
