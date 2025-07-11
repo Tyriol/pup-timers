@@ -1,5 +1,5 @@
 import db from "./db";
-import type { Dog } from "../types/types";
+import type { NewDog } from "../types/types";
 
 // get all dogs
 export const getAllDogsFromLocalDb = async () => {
@@ -8,7 +8,7 @@ export const getAllDogsFromLocalDb = async () => {
 };
 
 // add dog
-export const addDogToLocalDb = async (newDog: Dog) => {
+export const addDogToLocalDb = async (newDog: NewDog) => {
   const id = await db.dogs.add(newDog);
   return `New dog added, ${id}`;
 };
