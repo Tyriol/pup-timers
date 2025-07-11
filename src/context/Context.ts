@@ -1,16 +1,16 @@
 import { createContext } from "react";
-import type { Timer, Dog } from "../types/types";
+import type { Timer, Dog, NewTimer, NewDog } from "../types/types";
 
 interface TimersContextValue {
   timersList: Timer[];
-  addTimer: (timer: Timer) => void;
+  addTimer: (timer: NewTimer) => void;
   updateTimer: (timer: Timer) => void;
   deleteTimer: (id: string) => void;
 }
 
 interface DogsContextValue {
   dogsList: Dog[];
-  addDog: (dog: Dog) => void;
+  addDog: (dog: NewDog) => void;
   updateDog: (dog: Dog) => void;
   deleteDog: (id: string) => void;
 }
