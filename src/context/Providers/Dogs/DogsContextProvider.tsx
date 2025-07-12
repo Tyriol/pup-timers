@@ -14,10 +14,11 @@ export const DogsProvider = ({ children }: DogsProviderProps) => {
     const fetchAndSetDogs = async () => {
       try {
         const allDogs = await getAllDogsFromLocalDb();
+        console.log("All dog:", allDogs);
         setDogsList([...allDogs]);
       } catch (error) {
         console.log("error getting dogs");
-        console.error(error);
+        console.log("error", error);
       }
     };
     fetchAndSetDogs().catch((error) => {
@@ -27,11 +28,14 @@ export const DogsProvider = ({ children }: DogsProviderProps) => {
 
   const addDog = async (newDog: NewDog) => {
     const prev = dogsList;
-    // setDogsList((prevDogs) => [...prevDogs, newDog]);
+    console.log("before", dogsList);
     try {
-      await addDogToLocalDb(newDog);
+      const newDogId = await addDogToLocalDb(newDog);
+      console.log("New dog id", newDogId);
+      setDogsList((prevDogs) => [...prevDogs, { id: newDogId, ...newDog }]);
+      console.log("after:", dogsList);
     } catch (error) {
-      console.error(error);
+      console.log(error);
       setDogsList([...prev]);
     }
   };
