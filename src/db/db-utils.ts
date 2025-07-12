@@ -10,7 +10,7 @@ export const getAllDogsFromLocalDb = async () => {
 // add dog
 export const addDogToLocalDb = async (newDog: NewDog) => {
   const id = await db.dogs.add(newDog);
-  return `New dog added, ${id}`;
+  return id.toString();
 };
 // update dog
 
