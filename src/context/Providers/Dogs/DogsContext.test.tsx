@@ -2,14 +2,22 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useContext } from "react";
 import { IDBFactory } from "fake-indexeddb";
-import { describe, it, expect } from "vitest";
+import db from "../../../db/db";
+import { beforeEach, describe, it, expect } from "vitest";
 import { DogsContext } from "../../Context";
 import { DogsProvider } from "./DogsContextProvider";
 import type { Dog, NewDog } from "../../../types/types";
 
 describe("Dogs Context", () => {
-  it("Provide an empty dogs array by default", () => {
+  beforeEach(async () => {
     indexedDB = new IDBFactory();
+
+    return async () => {
+      db.dogs.clear();
+    };
+  });
+
+  it("Provide an empty dogs array by default", () => {
     const TestDogComponent = () => {
       const { dogsList } = useContext(DogsContext) as { dogsList: Dog[] };
 
@@ -28,12 +36,14 @@ describe("Dogs Context", () => {
   });
 
   it("adds a new dog to the dogs array", async () => {
-    indexedDB = new IDBFactory();
     const TestDogComponent = () => {
-      const context = useContext(DogsContext);
+      const { dogsList, addDog } = useContext(DogsContext) as {
+        dogsList: Dog[];
+        addDog: (newDog: NewDog) => void;
+      };
 
       const handleAddDog = () => {
-        context?.addDog(newDog);
+        addDog(newDog);
       };
 
       const newDog: NewDog = {
@@ -47,7 +57,7 @@ describe("Dogs Context", () => {
           <button data-testid="add-dog-button" onClick={handleAddDog}>
             Add new Dog
           </button>
-          <div data-testid="dogs-count">{context?.dogsList.length}</div>
+          <div data-testid="dogs-count">{dogsList.length}</div>
         </>
       );
     };
@@ -73,7 +83,6 @@ describe("Dogs Context", () => {
   });
 
   it("updates an existing dog in the dogs array", async () => {
-    indexedDB = new IDBFactory();
     const TestDogComponent = () => {
       const { dogsList, addDog, updateDog } = useContext(DogsContext) as {
         dogsList: Dog[];
@@ -136,7 +145,6 @@ describe("Dogs Context", () => {
   });
 
   it("deletes a dog from the dog array", async () => {
-    indexedDB = new IDBFactory();
     const TestDogComponent = () => {
       const { dogsList, addDog, deleteDog } = useContext(DogsContext) as {
         dogsList: Dog[];
