@@ -12,7 +12,7 @@ export interface Timer {
 export type NewTimer = Omit<Timer, "id">;
 
 export interface Dog {
-  id: string;
+  id: number;
   name: string;
   age: number;
   breed: string;
