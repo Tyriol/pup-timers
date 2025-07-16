@@ -1,19 +1,20 @@
 import db from "./db";
-import type { NewDog } from "../types/types";
+import type { NewDog, Dog } from "../types/types";
 
-// get all dogs
 export const getAllDogsFromLocalDb = async () => {
   const allDogs = await db.dogs.toArray();
   return allDogs;
 };
 
-// add dog
 export const addDogToLocalDb = async (newDog: NewDog) => {
   const id = await db.dogs.add(newDog);
-  return id.toString();
+  return id;
 };
-// update dog
 
+export const updateDogInLocalDb = async (id: number, changes: Partial<Dog>) => {
+  const result = await db.dogs.update(id, changes);
+  return result;
+};
 // delete dog
 
 // add timer
