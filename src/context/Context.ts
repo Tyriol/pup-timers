@@ -10,9 +10,9 @@ interface TimersContextValue {
 
 interface DogsContextValue {
   dogsList: Dog[];
-  addDog: (dog: NewDog) => void;
-  updateDog: (dog: Dog) => void;
-  deleteDog: (id: string) => void;
+  addDog: (dog: NewDog) => Promise<number>;
+  updateDog: (id: number, dog: Partial<Dog>) => void;
+  deleteDog: (id: number) => void;
 }
 
 export const TimersContext = createContext<TimersContextValue | undefined>(
