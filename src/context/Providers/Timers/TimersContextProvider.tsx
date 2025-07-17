@@ -1,5 +1,6 @@
-import { useState, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { TimersContext } from "../../Context";
+import { getAllTimersFromLocalDb } from "../../../db/db-utils";
 import type { Timer } from "../../../types/types";
 
 interface TimersProviderProps {
@@ -8,6 +9,20 @@ interface TimersProviderProps {
 
 export const TimersProvider = ({ children }: TimersProviderProps) => {
   const [timersList, setTimersList] = useState<Timer[]>([]);
+
+  useEffect(() => {
+    const fetchAndSetTimers = async () => {
+      try {
+        const allTimers = await getAllTimersFromLocalDb();
+        setTimersList([...allTimers]);
+      } catch (error) {
+        console.error("error getting timers:", error);
+      }
+    };
+    fetchAndSetTimers().catch((error) => {
+      console.error(error);
+    });
+  }, []);
 
   const addTimer = (newTimer: Timer) => {
     setTimersList((prevTimers) => [...prevTimers, newTimer]);
@@ -21,7 +36,7 @@ export const TimersProvider = ({ children }: TimersProviderProps) => {
     );
   };
 
-  const deleteTimer = (id: string) => {
+  const deleteTimer = (id: number) => {
     setTimersList((prevTimers) =>
       prevTimers.filter((timer) => timer.id !== id),
     );

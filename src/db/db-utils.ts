@@ -27,6 +27,10 @@ export const deleteDogFromLocalDb = async (id: number) => {
 };
 
 // add timer
+export const getAllTimersFromLocalDb = async () => {
+  const allTimers = await db.timers.toArray();
+  return allTimers;
+};
 
 // update timer
 
