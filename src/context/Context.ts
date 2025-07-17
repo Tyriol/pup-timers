@@ -1,11 +1,11 @@
 import { createContext } from "react";
-import type { Timer, Dog, NewTimer, NewDog } from "../types/types";
+import type { Timer, Dog, NewDog } from "../types/types";
 
 interface TimersContextValue {
   timersList: Timer[];
-  addTimer: (timer: NewTimer) => void;
+  addTimer: (timer: Timer) => void;
   updateTimer: (timer: Timer) => void;
-  deleteTimer: (id: string) => void;
+  deleteTimer: (id: number) => void;
 }
 
 interface DogsContextValue {
@@ -15,10 +15,20 @@ interface DogsContextValue {
   deleteDog: (id: number) => void;
 }
 
-export const TimersContext = createContext<TimersContextValue | undefined>(
-  undefined,
-);
+function throwProviderError(name: string): never {
+  throw new Error(`${name} called outside of Provider`);
+}
 
-export const DogsContext = createContext<DogsContextValue | undefined>(
-  undefined,
-);
+export const TimersContext = createContext<TimersContextValue>({
+  timersList: [],
+  addTimer: () => throwProviderError("addTimer"),
+  updateTimer: () => throwProviderError("updateTimer"),
+  deleteTimer: () => throwProviderError("deleteTimer"),
+});
+
+export const DogsContext = createContext<DogsContextValue>({
+  dogsList: [],
+  addDog: () => Promise.reject(new Error("addDog called outside of Provider")),
+  updateDog: () => throwProviderError("updateDog"),
+  deleteDog: () => throwProviderError("deleteDog"),
+});
