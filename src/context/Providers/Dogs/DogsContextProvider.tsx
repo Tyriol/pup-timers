@@ -4,6 +4,7 @@ import {
   addDogToLocalDb,
   getAllDogsFromLocalDb,
   updateDogInLocalDb,
+  deleteDogFromLocalDb,
 } from "../../../db/db-utils";
 import type { Dog, NewDog } from "../../../types/types";
 
@@ -57,8 +58,15 @@ export const DogsProvider = ({ children }: DogsProviderProps) => {
     }
   };
 
-  const deleteDog = (id: number) => {
-    setDogsList((prevDogs) => prevDogs.filter((dog) => dog.id !== id));
+  const deleteDog = async (id: number) => {
+    try {
+      const result = await deleteDogFromLocalDb(id);
+      if (result) {
+        setDogsList((prevDogs) => prevDogs.filter((dog) => dog.id !== id));
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const value = {

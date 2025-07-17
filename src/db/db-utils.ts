@@ -15,7 +15,16 @@ export const updateDogInLocalDb = async (id: number, changes: Partial<Dog>) => {
   const result = await db.dogs.update(id, changes);
   return result;
 };
-// delete dog
+
+export const deleteDogFromLocalDb = async (id: number) => {
+  await db.dogs.delete(id);
+  const result = await db.dogs.get(id);
+  if (result === undefined) {
+    return true;
+  } else {
+    throw new Error("Error deleting dog from the database");
+  }
+};
 
 // add timer
 

@@ -148,50 +148,59 @@ describe("Dogs Context", () => {
     });
   });
 
-  // it("deletes a dog from the dog array", async () => {
-  //   const TestDogComponent = () => {
-  //     const { dogsList, addDog, deleteDog } = useContext(DogsContext) as {
-  //       dogsList: Dog[];
-  //       addDog: (newDog: NewDog) => Promise<number>;
-  //       deleteDog: (id: number) => void;
-  //     };
+  it("deletes a dog from the dog array", async () => {
+    const TestDogComponent = () => {
+      const [dogId, setDogId] = useState<number>();
+      const { dogsList, addDog, deleteDog } = useContext(DogsContext) as {
+        dogsList: Dog[];
+        addDog: (newDog: NewDog) => Promise<number>;
+        deleteDog: (id: number | undefined) => void;
+      };
 
-  //     const newDog = {
-  //       name: "Buddy",
-  //       age: 3,
-  //       breed: "Golden Retriever",
-  //     };
+      const newDog = {
+        name: "Buddy",
+        age: 3,
+        breed: "Golden Retriever",
+      };
 
-  //     return (
-  //       <>
-  //         <button data-testid="add-dog-button" onClick={() => addDog(newDog)}>
-  //           Add new Dog
-  //         </button>
-  //         <div data-testid="dogs-count">{dogsList.length}</div>
-  //         <button data-testid="delete-dog-button" onClick={() => deleteDog(1)}>
-  //           Delete Dog
-  //         </button>
-  //       </>
-  //     );
-  //   };
+      const handleAddDog = async () => {
+        const result = await addDog(newDog);
+        setDogId(result);
+      };
 
-  //   render(
-  //     <DogsProvider>
-  //       <TestDogComponent />
-  //     </DogsProvider>,
-  //   );
+      return (
+        <>
+          <button data-testid="add-dog-button" onClick={handleAddDog}>
+            Add new Dog
+          </button>
+          <div data-testid="dogs-count">{dogsList.length}</div>
+          <button
+            data-testid="delete-dog-button"
+            onClick={() => deleteDog(dogId)}
+          >
+            Delete Dog
+          </button>
+        </>
+      );
+    };
 
-  //   const addDogButton = screen.getByTestId("add-dog-button");
-  //   const deleteDogButton = screen.getByTestId("delete-dog-button");
+    render(
+      <DogsProvider>
+        <TestDogComponent />
+      </DogsProvider>,
+    );
 
-  //   await userEvent.click(addDogButton);
+    const addDogButton = screen.getByTestId("add-dog-button");
+    const deleteDogButton = screen.getByTestId("delete-dog-button");
 
-  //   const dogCountBefore = screen.getByTestId("dogs-count").textContent;
-  //   expect(dogCountBefore).toBe("1");
+    await userEvent.click(addDogButton);
 
-  //   await userEvent.click(deleteDogButton);
+    const dogCountBefore = screen.getByTestId("dogs-count").textContent;
+    expect(dogCountBefore).toBe("1");
 
-  //   const dogCountAfter = screen.getByTestId("dogs-count").textContent;
-  //   expect(dogCountAfter).toBe("0");
-  // });
+    await userEvent.click(deleteDogButton);
+
+    const dogCountAfter = screen.getByTestId("dogs-count").textContent;
+    expect(dogCountAfter).toBe("0");
+  });
 });
