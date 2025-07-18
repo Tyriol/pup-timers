@@ -3,6 +3,7 @@ import { TimersContext } from "../../Context";
 import {
   getAllTimersFromLocalDb,
   addTimerToLocalDb,
+  updateTimerInLocalDb,
 } from "../../../db/db-utils";
 import type { Timer, NewTimer } from "../../../types/types";
 
@@ -43,12 +44,20 @@ export const TimersProvider = ({ children }: TimersProviderProps) => {
     }
   };
 
-  const updateTimer = (updatedTimer: Timer) => {
-    setTimersList((prevTimers) =>
-      prevTimers.map((timer) =>
-        timer.id === updatedTimer.id ? updatedTimer : timer,
-      ),
-    );
+  const updateTimer = async (id: number, updatedTimer: Partial<Timer>) => {
+    try {
+      const result = await updateTimerInLocalDb(id, updatedTimer);
+      if (result === 1) {
+        setTimersList((prevTimers) =>
+          prevTimers.map((timer) =>
+            timer.id === id ? { ...timer, ...updatedTimer } : timer,
+          ),
+        );
+      }
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   };
 
   const deleteTimer = (id: number) => {

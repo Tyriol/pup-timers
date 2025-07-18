@@ -1,5 +1,5 @@
 import db from "./db";
-import type { NewDog, Dog, NewTimer } from "../types/types";
+import type { NewDog, Dog, NewTimer, Timer } from "../types/types";
 
 export const getAllDogsFromLocalDb = async () => {
   const allDogs = await db.dogs.toArray();
@@ -31,13 +31,18 @@ export const getAllTimersFromLocalDb = async () => {
   return allTimers;
 };
 
-// add timer
 export const addTimerToLocalDb = async (newTimer: NewTimer) => {
   const id = await db.timers.add(newTimer);
   return id;
 };
 
-// update timer
+export const updateTimerInLocalDb = async (
+  id: number,
+  changes: Partial<Timer>,
+) => {
+  const result = await db.timers.update(id, changes);
+  return result;
+};
 
 // delete timer
 
