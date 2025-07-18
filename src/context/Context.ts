@@ -4,7 +4,7 @@ import type { Timer, Dog, NewDog, NewTimer } from "../types/types";
 interface TimersContextValue {
   timersList: Timer[];
   addTimer: (timer: NewTimer) => Promise<number>;
-  updateTimer: (timer: Timer) => void;
+  updateTimer: (id: number, timer: Partial<Timer>) => void;
   deleteTimer: (id: number) => void;
 }
 
