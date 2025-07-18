@@ -1,7 +1,10 @@
 import { useState, useEffect, type ReactNode } from "react";
 import { TimersContext } from "../../Context";
-import { getAllTimersFromLocalDb } from "../../../db/db-utils";
-import type { Timer } from "../../../types/types";
+import {
+  getAllTimersFromLocalDb,
+  addTimerToLocalDb,
+} from "../../../db/db-utils";
+import type { Timer, NewTimer } from "../../../types/types";
 
 interface TimersProviderProps {
   children: ReactNode;
@@ -24,8 +27,20 @@ export const TimersProvider = ({ children }: TimersProviderProps) => {
     });
   }, []);
 
-  const addTimer = (newTimer: Timer) => {
-    setTimersList((prevTimers) => [...prevTimers, newTimer]);
+  const addTimer = async (newTimer: NewTimer) => {
+    const prev = [...timersList];
+    try {
+      const newTimerId = await addTimerToLocalDb(newTimer);
+      setTimersList((prevTimers) => [
+        ...prevTimers,
+        { id: newTimerId, ...newTimer },
+      ]);
+      return newTimerId;
+    } catch (error) {
+      setTimersList([...prev]);
+      console.error(error);
+      throw error;
+    }
   };
 
   const updateTimer = (updatedTimer: Timer) => {
