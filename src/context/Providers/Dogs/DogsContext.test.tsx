@@ -192,12 +192,15 @@ describe("Dogs Context", () => {
 
     await userEvent.click(addDogButton);
 
-    const dogCountBefore = screen.getByTestId("dogs-count").textContent;
+    const dogCountBefore = (await screen.findByTestId("dogs-count"))
+      .textContent;
     expect(dogCountBefore).toBe("1");
 
     await userEvent.click(deleteDogButton);
 
-    const dogCountAfter = screen.getByTestId("dogs-count").textContent;
-    expect(dogCountAfter).toBe("0");
+    await waitFor(() => {
+      const dogCountAfter = screen.getByTestId("dogs-count").textContent;
+      expect(dogCountAfter).toBe("0");
+    });
   });
 });
