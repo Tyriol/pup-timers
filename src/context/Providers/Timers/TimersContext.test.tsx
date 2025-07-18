@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useContext, useState } from "react";
 import { IDBFactory } from "fake-indexeddb";
@@ -149,9 +149,11 @@ describe("Timers Context", () => {
 
     await userEvent.click(updateTimerButton);
 
-    const timerDurationAfter = (await screen.findByTestId("timer-duration"))
-      .textContent;
-    expect(timerDurationAfter).toBe("60");
+    await waitFor(() => {
+      const timerDurationAfter =
+        screen.getByTestId("timer-duration").textContent;
+      expect(timerDurationAfter).toBe("60");
+    });
   });
 
   // it("removes a timer from the timer array", async () => {
