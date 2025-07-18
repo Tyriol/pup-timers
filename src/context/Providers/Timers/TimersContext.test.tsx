@@ -156,63 +156,65 @@ describe("Timers Context", () => {
     });
   });
 
-  // it("removes a timer from the timer array", async () => {
-  //   const TestTimerComponent = () => {
-  //     const { timersList, addTimer, deleteTimer } = useContext(
-  //       TimersContext,
-  //     ) as {
-  //       timersList: Timer[];
-  //       addTimer: (newTimer: Timer) => void;
-  //       deleteTimer: (id: string) => void;
-  //     };
+  it("removes a timer from the timer array", async () => {
+    const TestTimerComponent = () => {
+      const [timerId, setTimerId] = useState<number>();
+      const { timersList, addTimer, deleteTimer } = useContext(TimersContext);
 
-  //     const newTimer: Timer = {
-  //       type: "countdown",
-  //       elapsed: 0,
-  //       isRunning: false,
-  //       startTime: undefined,
-  //       endTime: undefined,
-  //       id: "1",
-  //       name: "Morning Walk",
-  //       duration: 30,
-  //     };
+      const newTimer: NewTimer = {
+        type: "countdown",
+        elapsed: 0,
+        isRunning: false,
+        startTime: undefined,
+        endTime: undefined,
+        name: "Morning Walk",
+        duration: 30,
+      };
 
-  //     return (
-  //       <>
-  //         <button
-  //           data-testid="add-timer-button"
-  //           onClick={() => addTimer(newTimer)}
-  //         >
-  //           Add new Timer
-  //         </button>
-  //         <div data-testid="timer-count">{timersList.length}</div>
-  //         <button
-  //           data-testid="delete-timer-button"
-  //           onClick={() => deleteTimer("1")}
-  //         >
-  //           Delete Timer
-  //         </button>
-  //       </>
-  //     );
-  //   };
+      const handleAddTimer = async () => {
+        const newTimerId = await addTimer(newTimer);
+        setTimerId(newTimerId);
+      };
 
-  //   render(
-  //     <TimersProvider>
-  //       <TestTimerComponent />
-  //     </TimersProvider>,
-  //   );
+      const handleDeleteTimer = async () => {
+        if (timerId) {
+          deleteTimer(timerId);
+        }
+      };
 
-  //   const addTimerButton = screen.getByTestId("add-timer-button");
-  //   const deleteTimerButton = screen.getByTestId("delete-timer-button");
+      return (
+        <>
+          <button data-testid="add-timer-button" onClick={handleAddTimer}>
+            Add new Timer
+          </button>
+          <div data-testid="timer-count">{timersList.length}</div>
+          <button data-testid="delete-timer-button" onClick={handleDeleteTimer}>
+            Delete Timer
+          </button>
+        </>
+      );
+    };
 
-  //   await userEvent.click(addTimerButton);
+    render(
+      <TimersProvider>
+        <TestTimerComponent />
+      </TimersProvider>,
+    );
 
-  //   const timerCountBefore = screen.getByTestId("timer-count").textContent;
-  //   expect(timerCountBefore).toBe("1");
+    const addTimerButton = screen.getByTestId("add-timer-button");
+    const deleteTimerButton = screen.getByTestId("delete-timer-button");
 
-  //   await userEvent.click(deleteTimerButton);
+    await userEvent.click(addTimerButton);
 
-  //   const timerCountAfter = screen.getByTestId("timer-count").textContent;
-  //   expect(timerCountAfter).toBe("0");
-  // });
+    const timerCountBefore = (await screen.findByTestId("timer-count"))
+      .textContent;
+    expect(timerCountBefore).toBe("1");
+
+    await userEvent.click(deleteTimerButton);
+
+    await waitFor(() => {
+      const timerCountAfter = screen.getByTestId("timer-count").textContent;
+      expect(timerCountAfter).toBe("0");
+    });
+  });
 });
