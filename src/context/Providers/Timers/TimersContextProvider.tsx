@@ -4,6 +4,7 @@ import {
   getAllTimersFromLocalDb,
   addTimerToLocalDb,
   updateTimerInLocalDb,
+  deleteTimerFromLocalDb,
 } from "../../../db/db-utils";
 import type { Timer, NewTimer } from "../../../types/types";
 
@@ -60,10 +61,17 @@ export const TimersProvider = ({ children }: TimersProviderProps) => {
     }
   };
 
-  const deleteTimer = (id: number) => {
-    setTimersList((prevTimers) =>
-      prevTimers.filter((timer) => timer.id !== id),
-    );
+  const deleteTimer = async (id: number) => {
+    try {
+      const result = await deleteTimerFromLocalDb(id);
+      if (result) {
+        setTimersList((prevTimers) =>
+          prevTimers.filter((timer) => timer.id !== id),
+        );
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const value = {

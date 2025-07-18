@@ -44,7 +44,15 @@ export const updateTimerInLocalDb = async (
   return result;
 };
 
-// delete timer
+export const deleteTimerFromLocalDb = async (id: number) => {
+  await db.timers.delete(id);
+  const result = await db.timers.get(id);
+  if (result === undefined) {
+    return true;
+  } else {
+    throw new Error("Error deleting timer from the database");
+  }
+};
 
 // clear table
 // TODO: delete as I only want to use this while I'm working on getting the tables working
