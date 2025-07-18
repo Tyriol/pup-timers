@@ -6,7 +6,7 @@ import db from "../../../db/db";
 import { beforeEach, describe, it, expect } from "vitest";
 import { DogsContext } from "../../Context";
 import { DogsProvider } from "./DogsContextProvider";
-import type { Dog, NewDog } from "../../../types/types";
+import type { NewDog } from "../../../types/types";
 
 describe("Dogs Context", () => {
   beforeEach(() => {
@@ -19,7 +19,7 @@ describe("Dogs Context", () => {
 
   it("Provide an empty dogs array by default", () => {
     const TestDogComponent = () => {
-      const { dogsList } = useContext(DogsContext) as { dogsList: Dog[] };
+      const { dogsList } = useContext(DogsContext);
 
       return <div data-testid="dogs-count">{dogsList.length}</div>;
     };
@@ -37,10 +37,7 @@ describe("Dogs Context", () => {
 
   it("adds a new dog to the dogs array", async () => {
     const TestDogComponent = () => {
-      const { dogsList, addDog } = useContext(DogsContext) as {
-        dogsList: Dog[];
-        addDog: (newDog: NewDog) => void;
-      };
+      const { dogsList, addDog } = useContext(DogsContext);
 
       const handleAddDog = () => {
         addDog(newDog);
@@ -85,11 +82,7 @@ describe("Dogs Context", () => {
   it("updates an existing dog in the dogs array", async () => {
     const TestDogComponent = () => {
       const [dogId, setDogId] = useState<number>();
-      const { dogsList, addDog, updateDog } = useContext(DogsContext) as {
-        dogsList: Dog[];
-        addDog: (newDog: NewDog) => Promise<number>;
-        updateDog: (id: number | undefined, updatedDog: Partial<Dog>) => void;
-      };
+      const { dogsList, addDog, updateDog } = useContext(DogsContext);
 
       const newDog = {
         name: "Buddy",
@@ -106,7 +99,15 @@ describe("Dogs Context", () => {
         setDogId(result);
       };
 
-      const displayAge = dogsList.length === 0 ? "?" : dogsList[0].age;
+      const handleUpdateDog = async () => {
+        if (dogId) {
+          await updateDog(dogId, updatedDog);
+        } else {
+          console.log("No dog to update");
+        }
+      };
+
+      const displayAge = dogsList.find((dog) => dog.id === dogId)?.age ?? "?";
 
       return (
         <>
@@ -114,10 +115,7 @@ describe("Dogs Context", () => {
             Add new Dog
           </button>
           <div data-testid="dogs-age">{displayAge}</div>
-          <button
-            data-testid="update-dog-button"
-            onClick={() => updateDog(dogId, updatedDog)}
-          >
+          <button data-testid="update-dog-button" onClick={handleUpdateDog}>
             Update Dog
           </button>
         </>
@@ -151,11 +149,7 @@ describe("Dogs Context", () => {
   it("deletes a dog from the dog array", async () => {
     const TestDogComponent = () => {
       const [dogId, setDogId] = useState<number>();
-      const { dogsList, addDog, deleteDog } = useContext(DogsContext) as {
-        dogsList: Dog[];
-        addDog: (newDog: NewDog) => Promise<number>;
-        deleteDog: (id: number | undefined) => void;
-      };
+      const { dogsList, addDog, deleteDog } = useContext(DogsContext);
 
       const newDog = {
         name: "Buddy",
@@ -168,16 +162,19 @@ describe("Dogs Context", () => {
         setDogId(result);
       };
 
+      const handleDeleteDog = async () => {
+        if (dogId) {
+          await deleteDog(dogId);
+        }
+      };
+
       return (
         <>
           <button data-testid="add-dog-button" onClick={handleAddDog}>
             Add new Dog
           </button>
           <div data-testid="dogs-count">{dogsList.length}</div>
-          <button
-            data-testid="delete-dog-button"
-            onClick={() => deleteDog(dogId)}
-          >
+          <button data-testid="delete-dog-button" onClick={handleDeleteDog}>
             Delete Dog
           </button>
         </>
