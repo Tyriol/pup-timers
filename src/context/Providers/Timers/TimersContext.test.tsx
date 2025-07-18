@@ -83,80 +83,76 @@ describe("Timers Context", () => {
     expect(timerCountAfter).toBe("1");
   });
 
-  // it("updates an existing timer in the timers array", async () => {
-  //   const TestTimerComponent = () => {
-  //     const { timersList, addTimer, updateTimer } = useContext(
-  //       TimersContext,
-  //     ) as {
-  //       timersList: Timer[];
-  //       addTimer: (newTimer: Timer) => void;
-  //       updateTimer: (updatedTimer: Timer) => void;
-  //     };
+  it("updates an existing timer in the timers array", async () => {
+    const TestTimerComponent = () => {
+      const [timerId, setTimerId] = useState<number>();
+      const { timersList, addTimer, updateTimer } = useContext(TimersContext);
 
-  //     const newTimer: Timer = {
-  //       type: "countdown",
-  //       elapsed: 0,
-  //       isRunning: false,
-  //       startTime: undefined,
-  //       endTime: undefined,
-  //       id: "1",
-  //       name: "Morning Walk",
-  //       duration: 30,
-  //     };
+      const newTimer: NewTimer = {
+        type: "countdown",
+        elapsed: 0,
+        isRunning: false,
+        startTime: undefined,
+        endTime: undefined,
+        name: "Morning Walk",
+        duration: 30,
+      };
 
-  //     const updatedTimer: Timer = {
-  //       type: "countdown",
-  //       elapsed: 0,
-  //       isRunning: false,
-  //       startTime: undefined,
-  //       endTime: undefined,
-  //       id: "1",
-  //       name: "Morning Walk",
-  //       duration: 45,
-  //     };
+      const updatedTimer = {
+        name: "Morning Hike",
+        duration: 60,
+      };
 
-  //     const displayDuration =
-  //       timersList.length === 0 ? "?" : timersList[0].duration;
+      const handleAddTimer = async () => {
+        const newTimerId = await addTimer(newTimer);
+        setTimerId(newTimerId);
+      };
 
-  //     return (
-  //       <>
-  //         <button
-  //           data-testid="add-timer-button"
-  //           onClick={() => addTimer(newTimer)}
-  //         >
-  //           Add new Timer
-  //         </button>
-  //         <div data-testid="timer-duration">{displayDuration}</div>
-  //         <button
-  //           data-testid="update-timer-button"
-  //           onClick={() => updateTimer(updatedTimer)}
-  //         >
-  //           Update Timer
-  //         </button>
-  //       </>
-  //     );
-  //   };
+      const handleUpdateTimer = async () => {
+        if (timerId) {
+          await updateTimer(timerId, updatedTimer);
+        } else {
+          console.log("No timer to update");
+        }
+      };
 
-  //   render(
-  //     <TimersProvider>
-  //       <TestTimerComponent />
-  //     </TimersProvider>,
-  //   );
+      const displayDuration =
+        timersList.find((timer) => timer.id === timerId)?.duration ?? "?";
 
-  //   const addTimerButton = screen.getByTestId("add-timer-button");
-  //   const updateTimerButton = screen.getByTestId("update-timer-button");
+      return (
+        <>
+          <button data-testid="add-timer-button" onClick={handleAddTimer}>
+            Add new Timer
+          </button>
+          <div data-testid="timer-duration">{displayDuration}</div>
+          <button data-testid="update-timer-button" onClick={handleUpdateTimer}>
+            Update Timer
+          </button>
+        </>
+      );
+    };
 
-  //   await userEvent.click(addTimerButton);
+    render(
+      <TimersProvider>
+        <TestTimerComponent />
+      </TimersProvider>,
+    );
 
-  //   const timerDurationBefore =
-  //     screen.getByTestId("timer-duration").textContent;
-  //   expect(timerDurationBefore).toBe("30");
+    const addTimerButton = screen.getByTestId("add-timer-button");
+    const updateTimerButton = screen.getByTestId("update-timer-button");
 
-  //   await userEvent.click(updateTimerButton);
+    await userEvent.click(addTimerButton);
 
-  //   const timerDurationAfter = screen.getByTestId("timer-duration").textContent;
-  //   expect(timerDurationAfter).toBe("45");
-  // });
+    const timerDurationBefore = (await screen.findByTestId("timer-duration"))
+      .textContent;
+    expect(timerDurationBefore).toBe("30");
+
+    await userEvent.click(updateTimerButton);
+
+    const timerDurationAfter = (await screen.findByTestId("timer-duration"))
+      .textContent;
+    expect(timerDurationAfter).toBe("60");
+  });
 
   // it("removes a timer from the timer array", async () => {
   //   const TestTimerComponent = () => {
