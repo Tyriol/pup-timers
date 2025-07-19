@@ -1,17 +1,25 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { useContext } from "react";
+import { useContext, useState } from "react";
+import { IDBFactory } from "fake-indexeddb";
+import db from "../../../db/db";
 import { TimersContext } from "../../Context";
 import { TimersProvider } from "./TimersContextProvider";
-import type { Timer } from "../../../types/types";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
+import type { NewTimer } from "../../../types/types";
 
 describe("Timers Context", () => {
+  beforeEach(() => {
+    indexedDB = new IDBFactory();
+
+    return async () => {
+      await db.timers.clear();
+    };
+  });
+
   it("Provides an empty timers array by default", () => {
     const TestComponent = () => {
-      const { timersList } = useContext(TimersContext) as {
-        timersList: Timer[];
-      };
+      const { timersList } = useContext(TimersContext);
 
       return <div data-testid="timers-count">{timersList.length}</div>;
     };
@@ -22,36 +30,38 @@ describe("Timers Context", () => {
       </TimersProvider>,
     );
 
-    expect(screen.getByTestId("timers-count").textContent).toBe("0");
+    const timersCount = screen.getByTestId("timers-count").textContent;
+
+    expect(timersCount).toBe("0");
   });
 
   it("adds a new timer to the timers array", async () => {
     const TestTimerComponent = () => {
-      const { timersList, addTimer } = useContext(TimersContext) as {
-        timersList: Timer[];
-        addTimer: (newTimer: Timer) => void;
-      };
+      const [timerId, setTimerId] = useState<number>();
+      const { timersList, addTimer } = useContext(TimersContext);
 
-      const newTimer: Timer = {
+      const newTimer: NewTimer = {
         type: "countdown",
         elapsed: 0,
         isRunning: false,
         startTime: undefined,
         endTime: undefined,
-        id: "1",
         name: "Morning Walk",
         duration: 30,
       };
 
+      const handleAddTimer = async () => {
+        const newTimerId = await addTimer(newTimer);
+        setTimerId(newTimerId);
+      };
+
       return (
         <>
-          <button
-            data-testid="add-timer-button"
-            onClick={() => addTimer(newTimer)}
-          >
+          <button data-testid="add-timer-button" onClick={handleAddTimer}>
             Add new Timer
           </button>
           <div data-testid="timers-count">{timersList.length}</div>
+          {timerId ? <p>Timer Id: {timerId}</p> : null}
         </>
       );
     };
@@ -68,58 +78,54 @@ describe("Timers Context", () => {
     const addTimerButton = screen.getByTestId("add-timer-button");
     await userEvent.click(addTimerButton);
 
-    const timerCountAfter = screen.getByTestId("timers-count").textContent;
+    const timerCountAfter = (await screen.findByTestId("timers-count"))
+      .textContent;
     expect(timerCountAfter).toBe("1");
   });
 
   it("updates an existing timer in the timers array", async () => {
     const TestTimerComponent = () => {
-      const { timersList, addTimer, updateTimer } = useContext(
-        TimersContext,
-      ) as {
-        timersList: Timer[];
-        addTimer: (newTimer: Timer) => void;
-        updateTimer: (updatedTimer: Timer) => void;
-      };
+      const [timerId, setTimerId] = useState<number>();
+      const { timersList, addTimer, updateTimer } = useContext(TimersContext);
 
-      const newTimer: Timer = {
+      const newTimer: NewTimer = {
         type: "countdown",
         elapsed: 0,
         isRunning: false,
         startTime: undefined,
         endTime: undefined,
-        id: "1",
         name: "Morning Walk",
         duration: 30,
       };
 
-      const updatedTimer: Timer = {
-        type: "countdown",
-        elapsed: 0,
-        isRunning: false,
-        startTime: undefined,
-        endTime: undefined,
-        id: "1",
-        name: "Morning Walk",
-        duration: 45,
+      const updatedTimer = {
+        name: "Morning Hike",
+        duration: 60,
+      };
+
+      const handleAddTimer = async () => {
+        const newTimerId = await addTimer(newTimer);
+        setTimerId(newTimerId);
+      };
+
+      const handleUpdateTimer = async () => {
+        if (timerId) {
+          await updateTimer(timerId, updatedTimer);
+        } else {
+          console.log("No timer to update");
+        }
       };
 
       const displayDuration =
-        timersList.length === 0 ? "?" : timersList[0].duration;
+        timersList.find((timer) => timer.id === timerId)?.duration ?? "?";
 
       return (
         <>
-          <button
-            data-testid="add-timer-button"
-            onClick={() => addTimer(newTimer)}
-          >
+          <button data-testid="add-timer-button" onClick={handleAddTimer}>
             Add new Timer
           </button>
           <div data-testid="timer-duration">{displayDuration}</div>
-          <button
-            data-testid="update-timer-button"
-            onClick={() => updateTimer(updatedTimer)}
-          >
+          <button data-testid="update-timer-button" onClick={handleUpdateTimer}>
             Update Timer
           </button>
         </>
@@ -137,50 +143,52 @@ describe("Timers Context", () => {
 
     await userEvent.click(addTimerButton);
 
-    const timerDurationBefore =
-      screen.getByTestId("timer-duration").textContent;
+    const timerDurationBefore = (await screen.findByTestId("timer-duration"))
+      .textContent;
     expect(timerDurationBefore).toBe("30");
 
     await userEvent.click(updateTimerButton);
 
-    const timerDurationAfter = screen.getByTestId("timer-duration").textContent;
-    expect(timerDurationAfter).toBe("45");
+    await waitFor(() => {
+      const timerDurationAfter =
+        screen.getByTestId("timer-duration").textContent;
+      expect(timerDurationAfter).toBe("60");
+    });
   });
 
   it("removes a timer from the timer array", async () => {
     const TestTimerComponent = () => {
-      const { timersList, addTimer, deleteTimer } = useContext(
-        TimersContext,
-      ) as {
-        timersList: Timer[];
-        addTimer: (newTimer: Timer) => void;
-        deleteTimer: (id: string) => void;
-      };
+      const [timerId, setTimerId] = useState<number>();
+      const { timersList, addTimer, deleteTimer } = useContext(TimersContext);
 
-      const newTimer: Timer = {
+      const newTimer: NewTimer = {
         type: "countdown",
         elapsed: 0,
         isRunning: false,
         startTime: undefined,
         endTime: undefined,
-        id: "1",
         name: "Morning Walk",
         duration: 30,
       };
 
+      const handleAddTimer = async () => {
+        const newTimerId = await addTimer(newTimer);
+        setTimerId(newTimerId);
+      };
+
+      const handleDeleteTimer = async () => {
+        if (timerId) {
+          deleteTimer(timerId);
+        }
+      };
+
       return (
         <>
-          <button
-            data-testid="add-timer-button"
-            onClick={() => addTimer(newTimer)}
-          >
+          <button data-testid="add-timer-button" onClick={handleAddTimer}>
             Add new Timer
           </button>
           <div data-testid="timer-count">{timersList.length}</div>
-          <button
-            data-testid="delete-timer-button"
-            onClick={() => deleteTimer("1")}
-          >
+          <button data-testid="delete-timer-button" onClick={handleDeleteTimer}>
             Delete Timer
           </button>
         </>
@@ -198,12 +206,15 @@ describe("Timers Context", () => {
 
     await userEvent.click(addTimerButton);
 
-    const timerCountBefore = screen.getByTestId("timer-count").textContent;
+    const timerCountBefore = (await screen.findByTestId("timer-count"))
+      .textContent;
     expect(timerCountBefore).toBe("1");
 
     await userEvent.click(deleteTimerButton);
 
-    const timerCountAfter = screen.getByTestId("timer-count").textContent;
-    expect(timerCountAfter).toBe("0");
+    await waitFor(() => {
+      const timerCountAfter = screen.getByTestId("timer-count").textContent;
+      expect(timerCountAfter).toBe("0");
+    });
   });
 });
