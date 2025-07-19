@@ -1,14 +1,9 @@
 import { useContext, useState } from "react";
 import { DogsContext } from "../../context/Context";
-import type { Dog, NewDog } from "../../types/types";
 
 const TestDogComponent = () => {
   const [dogId, setDogId] = useState<number>();
-  const { dogsList, addDog, updateDog } = useContext(DogsContext) as {
-    dogsList: Dog[];
-    addDog: (newDog: NewDog) => Promise<number>;
-    updateDog: (id: number | undefined, updatedDog: Partial<Dog>) => void;
-  };
+  const { dogsList, addDog, updateDog } = useContext(DogsContext);
 
   const newDog = {
     name: "Dexter",
@@ -25,6 +20,12 @@ const TestDogComponent = () => {
     setDogId(result);
   };
 
+  const handleUpdateDog = () => {
+    if (dogId) {
+      updateDog(dogId, updatedDog);
+    }
+  };
+
   const displayAge = dogsList.find((dog) => dog.id === dogId)?.age ?? "?";
 
   return (
@@ -35,7 +36,7 @@ const TestDogComponent = () => {
       <div data-testid="dogs-age">{displayAge}</div>
       <button
         data-testid="update-dog-button"
-        onClick={() => updateDog(dogId, updatedDog)}
+        onClick={() => void handleUpdateDog()}
       >
         Update Dog
       </button>
