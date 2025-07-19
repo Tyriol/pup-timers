@@ -30,7 +30,7 @@ export const DogsProvider = ({ children }: DogsProviderProps) => {
   }, []);
 
   const addDog = async (newDog: NewDog) => {
-    const prev = dogsList;
+    const prev = [...dogsList];
     try {
       const newDogId = await addDogToLocalDb(newDog);
       setDogsList((prevDogs) => [...prevDogs, { id: newDogId, ...newDog }]);
