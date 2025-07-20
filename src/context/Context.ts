@@ -4,15 +4,15 @@ import type { Timer, Dog, NewDog, NewTimer } from "../types/types";
 interface TimersContextValue {
   timersList: Timer[];
   addTimer: (timer: NewTimer) => Promise<number>;
-  updateTimer: (id: number, timer: Partial<Timer>) => void;
-  deleteTimer: (id: number) => void;
+  updateTimer: (id: number, timer: Partial<Timer>) => Promise<void>;
+  deleteTimer: (id: number) => Promise<void>;
 }
 
 interface DogsContextValue {
   dogsList: Dog[];
   addDog: (dog: NewDog) => Promise<number>;
-  updateDog: (id: number, dog: Partial<Dog>) => void;
-  deleteDog: (id: number) => void;
+  updateDog: (id: number, dog: Partial<Dog>) => Promise<void>;
+  deleteDog: (id: number) => Promise<void>;
 }
 
 function throwProviderError(name: string): never {
