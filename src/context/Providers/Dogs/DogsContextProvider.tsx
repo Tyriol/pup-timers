@@ -43,7 +43,7 @@ export const DogsProvider = ({ children }: DogsProviderProps) => {
       return newDogId;
     } catch (error) {
       setDogsList((prevDogs) =>
-        prevDogs.filter((dog) => dog.id === tempDog.id),
+        prevDogs.filter((dog) => dog.id !== tempDog.id),
       );
       console.error(error);
       throw error;
