@@ -1,6 +1,12 @@
-import { useState, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { DogsContext } from "../../Context";
-import type { Dog } from "../../../types/types";
+import {
+  addDogToLocalDb,
+  getAllDogsFromLocalDb,
+  updateDogInLocalDb,
+  deleteDogFromLocalDb,
+} from "../../../db/db-utils";
+import type { Dog, NewDog } from "../../../types/types";
 
 interface DogsProviderProps {
   children: ReactNode;
@@ -9,18 +15,66 @@ interface DogsProviderProps {
 export const DogsProvider = ({ children }: DogsProviderProps) => {
   const [dogsList, setDogsList] = useState<Dog[]>([]);
 
-  const addDog = (newDog: Dog) => {
-    setDogsList((prevDogs) => [...prevDogs, newDog]);
+  useEffect(() => {
+    const fetchAndSetDogs = async () => {
+      try {
+        const allDogs = await getAllDogsFromLocalDb();
+        setDogsList([...allDogs]);
+      } catch (error) {
+        console.error("error getting dogs:", error);
+      }
+    };
+    fetchAndSetDogs().catch((error) => {
+      console.error(error);
+    });
+  }, []);
+
+  const addDog = async (newDog: NewDog) => {
+    // temp id for optimistic updates
+    const tempDog = { id: Date.now(), ...newDog };
+    setDogsList((prevDogs) => [...prevDogs, tempDog]);
+    try {
+      const newDogId = await addDogToLocalDb(newDog);
+      setDogsList((prevDogs) =>
+        prevDogs.map((dog) =>
+          dog.id === tempDog.id ? { ...dog, id: newDogId } : dog,
+        ),
+      );
+      return newDogId;
+    } catch (error) {
+      setDogsList((prevDogs) =>
+        prevDogs.filter((dog) => dog.id !== tempDog.id),
+      );
+      console.error(error);
+      throw error;
+    }
   };
 
-  const updateDog = (updatedDog: Dog) => {
-    setDogsList((prevDogs) =>
-      prevDogs.map((dog) => (dog.id === updatedDog.id ? updatedDog : dog)),
-    );
+  const updateDog = async (id: number, updatedDog: Partial<Dog>) => {
+    try {
+      const result = await updateDogInLocalDb(id, updatedDog);
+      if (result === 1) {
+        setDogsList((prevDogs) =>
+          prevDogs.map((dog) =>
+            dog.id === id ? { ...dog, ...updatedDog } : dog,
+          ),
+        );
+      }
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   };
 
-  const deleteDog = (id: string) => {
-    setDogsList((prevDogs) => prevDogs.filter((dog) => dog.id !== id));
+  const deleteDog = async (id: number) => {
+    try {
+      const result = await deleteDogFromLocalDb(id);
+      if (result) {
+        setDogsList((prevDogs) => prevDogs.filter((dog) => dog.id !== id));
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const value = {

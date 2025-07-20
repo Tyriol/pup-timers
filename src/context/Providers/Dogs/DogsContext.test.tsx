@@ -1,15 +1,25 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { useContext } from "react";
-import { describe, it, expect } from "vitest";
+import { useContext, useState } from "react";
+import { IDBFactory } from "fake-indexeddb";
+import db from "../../../db/db";
+import { beforeEach, describe, it, expect } from "vitest";
 import { DogsContext } from "../../Context";
 import { DogsProvider } from "./DogsContextProvider";
-import type { Dog } from "../../../types/types";
+import type { NewDog } from "../../../types/types";
 
 describe("Dogs Context", () => {
+  beforeEach(() => {
+    indexedDB = new IDBFactory();
+
+    return async () => {
+      await db.dogs.clear();
+    };
+  });
+
   it("Provide an empty dogs array by default", () => {
     const TestDogComponent = () => {
-      const { dogsList } = useContext(DogsContext) as { dogsList: Dog[] };
+      const { dogsList } = useContext(DogsContext);
 
       return <div data-testid="dogs-count">{dogsList.length}</div>;
     };
@@ -25,15 +35,15 @@ describe("Dogs Context", () => {
     expect(dogCount).toBe("0");
   });
 
-  it("add a new dog to the dogs array", async () => {
+  it("adds a new dog to the dogs array", async () => {
     const TestDogComponent = () => {
-      const { dogsList, addDog } = useContext(DogsContext) as {
-        dogsList: Dog[];
-        addDog: (newDog: Dog) => void;
+      const { dogsList, addDog } = useContext(DogsContext);
+
+      const handleAddDog = async () => {
+        await addDog(newDog);
       };
 
-      const newDog = {
-        id: "1",
+      const newDog: NewDog = {
         name: "Buddy",
         age: 3,
         breed: "Golden Retriever",
@@ -41,7 +51,7 @@ describe("Dogs Context", () => {
 
       return (
         <>
-          <button data-testid="add-dog-button" onClick={() => addDog(newDog)}>
+          <button data-testid="add-dog-button" onClick={handleAddDog}>
             Add new Dog
           </button>
           <div data-testid="dogs-count">{dogsList.length}</div>
@@ -55,49 +65,57 @@ describe("Dogs Context", () => {
       </DogsProvider>,
     );
 
-    const dogCountBefore = screen.getByTestId("dogs-count").textContent;
-    expect(dogCountBefore).toBe("0");
+    await waitFor(() => {
+      const dogCountBefore = screen.getByTestId("dogs-count").textContent;
+      expect(dogCountBefore).toBe("0");
+    });
 
     const addDogButton = screen.getByTestId("add-dog-button");
     await userEvent.click(addDogButton);
 
-    const dogCountAfter = screen.getByTestId("dogs-count").textContent;
-    expect(dogCountAfter).toBe("1");
+    await waitFor(() => {
+      const dogCountAfter = screen.getByTestId("dogs-count").textContent;
+      expect(dogCountAfter).toBe("1");
+    });
   });
 
   it("updates an existing dog in the dogs array", async () => {
     const TestDogComponent = () => {
-      const { dogsList, addDog, updateDog } = useContext(DogsContext) as {
-        dogsList: Dog[];
-        addDog: (newDog: Dog) => void;
-        updateDog: (updatedDog: Dog) => void;
-      };
+      const [dogId, setDogId] = useState<number>();
+      const { dogsList, addDog, updateDog } = useContext(DogsContext);
 
       const newDog = {
-        id: "1",
         name: "Buddy",
         age: 3,
         breed: "Golden Retriever",
       };
+
       const updatedDog = {
-        id: "1",
-        name: "Buddy",
         age: 4,
-        breed: "Golden Retriever",
       };
 
-      const displayAge = dogsList.length === 0 ? "?" : dogsList[0].age;
+      const handleAddDog = async () => {
+        const result = await addDog(newDog);
+        setDogId(result);
+      };
+
+      const handleUpdateDog = async () => {
+        if (dogId) {
+          await updateDog(dogId, updatedDog);
+        } else {
+          console.log("No dog to update");
+        }
+      };
+
+      const displayAge = dogsList.find((dog) => dog.id === dogId)?.age ?? "?";
 
       return (
         <>
-          <button data-testid="add-dog-button" onClick={() => addDog(newDog)}>
+          <button data-testid="add-dog-button" onClick={handleAddDog}>
             Add new Dog
           </button>
           <div data-testid="dogs-age">{displayAge}</div>
-          <button
-            data-testid="update-dog-button"
-            onClick={() => updateDog(updatedDog)}
-          >
+          <button data-testid="update-dog-button" onClick={handleUpdateDog}>
             Update Dog
           </button>
         </>
@@ -115,40 +133,48 @@ describe("Dogs Context", () => {
 
     await userEvent.click(addDogButton);
 
-    const dogAgeBefore = screen.getByTestId("dogs-age").textContent;
-    expect(dogAgeBefore).toBe("3");
+    await waitFor(() => {
+      const dogAgeBefore = screen.getByTestId("dogs-age").textContent;
+      expect(dogAgeBefore).toBe("3");
+    });
 
     await userEvent.click(updateDogButton);
 
-    const dogAgeAfter = screen.getByTestId("dogs-age").textContent;
-    expect(dogAgeAfter).toBe("4");
+    await waitFor(() => {
+      const dogAgeAfter = screen.getByTestId("dogs-age").textContent;
+      expect(dogAgeAfter).toBe("4");
+    });
   });
 
   it("deletes a dog from the dog array", async () => {
     const TestDogComponent = () => {
-      const { dogsList, addDog, deleteDog } = useContext(DogsContext) as {
-        dogsList: Dog[];
-        addDog: (newDog: Dog) => void;
-        deleteDog: (id: string) => void;
-      };
+      const [dogId, setDogId] = useState<number>();
+      const { dogsList, addDog, deleteDog } = useContext(DogsContext);
 
       const newDog = {
-        id: "1",
         name: "Buddy",
         age: 3,
         breed: "Golden Retriever",
       };
 
+      const handleAddDog = async () => {
+        const result = await addDog(newDog);
+        setDogId(result);
+      };
+
+      const handleDeleteDog = async () => {
+        if (dogId) {
+          await deleteDog(dogId);
+        }
+      };
+
       return (
         <>
-          <button data-testid="add-dog-button" onClick={() => addDog(newDog)}>
+          <button data-testid="add-dog-button" onClick={handleAddDog}>
             Add new Dog
           </button>
           <div data-testid="dogs-count">{dogsList.length}</div>
-          <button
-            data-testid="delete-dog-button"
-            onClick={() => deleteDog("1")}
-          >
+          <button data-testid="delete-dog-button" onClick={handleDeleteDog}>
             Delete Dog
           </button>
         </>
@@ -166,12 +192,15 @@ describe("Dogs Context", () => {
 
     await userEvent.click(addDogButton);
 
-    const dogCountBefore = screen.getByTestId("dogs-count").textContent;
+    const dogCountBefore = (await screen.findByTestId("dogs-count"))
+      .textContent;
     expect(dogCountBefore).toBe("1");
 
     await userEvent.click(deleteDogButton);
 
-    const dogCountAfter = screen.getByTestId("dogs-count").textContent;
-    expect(dogCountAfter).toBe("0");
+    await waitFor(() => {
+      const dogCountAfter = screen.getByTestId("dogs-count").textContent;
+      expect(dogCountAfter).toBe("0");
+    });
   });
 });
