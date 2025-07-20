@@ -39,8 +39,8 @@ describe("Dogs Context", () => {
     const TestDogComponent = () => {
       const { dogsList, addDog } = useContext(DogsContext);
 
-      const handleAddDog = () => {
-        addDog(newDog);
+      const handleAddDog = async () => {
+        await addDog(newDog);
       };
 
       const newDog: NewDog = {
