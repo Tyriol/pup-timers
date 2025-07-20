@@ -20,9 +20,9 @@ const TestDogComponent = () => {
     setDogId(result);
   };
 
-  const handleUpdateDog = () => {
+  const handleUpdateDog = async () => {
     if (dogId) {
-      updateDog(dogId, updatedDog);
+      await updateDog(dogId, updatedDog);
     }
   };
 
