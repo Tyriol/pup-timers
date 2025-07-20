@@ -30,18 +30,21 @@ export const TimersProvider = ({ children }: TimersProviderProps) => {
   }, []);
 
   const addTimer = async (newTimer: NewTimer) => {
-    let newTimerId: number | null = null;
+    // temporary id for optimistic update
+    const tempTimer = { id: Date.now(), ...newTimer };
+    setTimersList((prevTimers) => [...prevTimers, tempTimer]);
     try {
-      newTimerId = await addTimerToLocalDb(newTimer);
-      const addedTimer = { id: newTimerId, ...newTimer };
-      setTimersList((prevTimers) => [...prevTimers, addedTimer]);
+      const newTimerId = await addTimerToLocalDb(newTimer);
+      setTimersList((prevTimers) =>
+        prevTimers.map((timer) =>
+          timer.id === tempTimer.id ? { ...timer, id: newTimerId } : timer,
+        ),
+      );
       return newTimerId;
     } catch (error) {
-      if (newTimerId) {
-        setTimersList((prevTimers) =>
-          prevTimers.filter((timer) => timer.id !== newTimerId),
-        );
-      }
+      setTimersList((prevTimers) =>
+        prevTimers.filter((timer) => timer.id !== tempTimer.id),
+      );
       console.error(error);
       throw error;
     }

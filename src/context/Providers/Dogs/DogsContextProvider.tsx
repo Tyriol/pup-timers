@@ -30,13 +30,21 @@ export const DogsProvider = ({ children }: DogsProviderProps) => {
   }, []);
 
   const addDog = async (newDog: NewDog) => {
-    const prev = [...dogsList];
+    // temp id for optimistic updates
+    const tempDog = { id: Date.now(), ...newDog };
+    setDogsList((prevDogs) => [...prevDogs, tempDog]);
     try {
       const newDogId = await addDogToLocalDb(newDog);
-      setDogsList((prevDogs) => [...prevDogs, { id: newDogId, ...newDog }]);
+      setDogsList((prevDogs) =>
+        prevDogs.map((dog) =>
+          dog.id === tempDog.id ? { ...dog, id: newDogId } : dog,
+        ),
+      );
       return newDogId;
     } catch (error) {
-      setDogsList([...prev]);
+      setDogsList((prevDogs) =>
+        prevDogs.filter((dog) => dog.id === tempDog.id),
+      );
       console.error(error);
       throw error;
     }
