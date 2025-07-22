@@ -12,12 +12,8 @@ export const getTimeFromSeconds = (secs: number) => {
   };
 };
 
-export const formatTime = (
-  seconds: number,
-  minutes: number,
-  hours: number,
-  days: number,
-) => {
+export const formatTime = (secs: number) => {
+  const { seconds, minutes, hours, days } = getTimeFromSeconds(secs);
   const displayDays =
     days === 0 ? "0 days" : days === 1 ? "1 day" : days + " days";
   const displayHours = hours < 10 ? "0" + hours : hours;
@@ -26,6 +22,6 @@ export const formatTime = (
 
   return {
     displayDays,
-    displayTime: `${displayHours}h ${displayMinutes}m ${displaySeconds}s`,
+    displayTime: `${displayHours}:${displayMinutes}:${displaySeconds}`,
   };
 };

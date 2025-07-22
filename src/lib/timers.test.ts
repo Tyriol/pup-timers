@@ -11,20 +11,20 @@ describe("The timer utility functions", () => {
   });
 
   it("returns formatted time to display", () => {
-    const { displayDays, displayTime } = formatTime(10, 20, 18, 1);
-    expect(displayTime).toBe("18h 20m 10s");
+    const { displayDays, displayTime } = formatTime(152410);
+    expect(displayTime).toBe("18:20:10");
     expect(displayDays).toBe("1 day");
   });
 
   it("correctly formats 0 days", () => {
-    const { displayDays, displayTime } = formatTime(10, 20, 18, 0);
-    expect(displayTime).toBe("18h 20m 10s");
+    const { displayDays, displayTime } = formatTime(66010);
+    expect(displayTime).toBe("18:20:10");
     expect(displayDays).toBe("0 days");
   });
 
   it("correctly formats more than 1 days", () => {
-    const { displayDays, displayTime } = formatTime(10, 20, 18, 10);
-    expect(displayTime).toBe("18h 20m 10s");
+    const { displayDays, displayTime } = formatTime(930010);
+    expect(displayTime).toBe("18:20:10");
     expect(displayDays).toBe("10 days");
   });
 });
