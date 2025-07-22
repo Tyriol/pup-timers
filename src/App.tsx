@@ -1,11 +1,11 @@
 import "./App.css";
-import TestDogComponent from "./components/DogsProviderTest/DogsProviderTest";
+import Stopwatch from "./components/Stopwatch/Stopwatch";
 
 function App() {
   return (
-    <div className="flex items-center justify-center">
-      <h1 className="text-3xl font-bold underline">Pup Timers!</h1>
-      <TestDogComponent />
+    <div className="flex flex-col items-center justify-center">
+      <h1 className="font-bold text-4x1 underline">Pup Timers!</h1>
+      <Stopwatch secs={930010} />
     </div>
   );
 }
