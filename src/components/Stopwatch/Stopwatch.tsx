@@ -28,7 +28,7 @@ const Stopwatch = ({ secs = 0 }: StopWatchProps) => {
 
   useEffect(() => {
     incrementTime();
-  }, [elapsedSecs]);
+  }, [elapsedSecs, incrementTime]);
 
   const toggleTimerOnOff = () => {
     setIsRunning((prev) => !prev);
