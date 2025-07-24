@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { formatTime } from "../../lib/timers";
-
+import type { Timer } from "../../types/types";
 interface StopWatchProps {
-  secs?: number;
+  timer: Timer;
 }
 
-const Stopwatch = ({ secs = 0 }: StopWatchProps) => {
-  const [elapsedSecs, setElapsedSecs] = useState<number>(secs);
+const Stopwatch = ({ timer }: StopWatchProps) => {
+  const [elapsedSecs, setElapsedSecs] = useState<number>(timer.elapsed);
   const [stateDays, setStateDays] = useState<string>("");
   const [stateTime, setStateTime] = useState<string>("");
-  const [isRunning, setIsRunning] = useState<boolean>(false);
+  const [isRunning, setIsRunning] = useState<boolean>(timer.isRunning);
 
   useEffect(() => {
     if (isRunning) {
@@ -37,20 +37,15 @@ const Stopwatch = ({ secs = 0 }: StopWatchProps) => {
   return (
     <>
       <div className="flex flex-col items-center justify-center gap-5 p-20">
-        <h2
-          style={{ fontFamily: "VT323", fontWeight: "600", fontSize: "1.5rem" }}
-        >
-          {stateDays}
-        </h2>
-        <h2
-          style={{ fontFamily: "VT323", fontWeight: "600", fontSize: "1.5rem" }}
-        >
-          {stateTime}
-        </h2>
+        <p>{timer.name}</p>
+        <p>{stateDays}</p>
+        <p>{stateTime}</p>
         <button onClick={toggleTimerOnOff}>
           {isRunning ? "Stop" : "Start"}
         </button>
-        {!isRunning ? <button onClick={resetElapsedTime}>Reset</button> : null}
+        {!isRunning && elapsedSecs > 0 ? (
+          <button onClick={resetElapsedTime}>Reset</button>
+        ) : null}
       </div>
     </>
   );
