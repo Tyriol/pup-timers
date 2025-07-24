@@ -34,6 +34,10 @@ const Stopwatch = ({ secs = 0 }: StopWatchProps) => {
     setIsRunning((prev) => !prev);
   };
 
+  const resetElapsedTime = () => {
+    setElapsedSecs(0);
+  };
+
   return (
     <>
       <div className="flex flex-col items-center justify-center gap-5 p-20">
@@ -50,7 +54,7 @@ const Stopwatch = ({ secs = 0 }: StopWatchProps) => {
         <button onClick={toggleTimerOnOff}>
           {isRunning ? "Stop" : "Start"}
         </button>
-        <button>Reset</button>
+        {!isRunning ? <button onClick={resetElapsedTime}>Reset</button> : null}
       </div>
     </>
   );
