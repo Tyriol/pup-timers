@@ -11,12 +11,6 @@ const Stopwatch = ({ secs = 0 }: StopWatchProps) => {
   const [stateTime, setStateTime] = useState<string>("");
   const [isRunning, setIsRunning] = useState<boolean>(false);
 
-  const incrementTime = () => {
-    const { displayDays, displayTime } = formatTime(elapsedSecs);
-    setStateDays(() => displayDays);
-    setStateTime(() => displayTime);
-  };
-
   useEffect(() => {
     if (isRunning) {
       const interval = setInterval(() => {
@@ -27,8 +21,10 @@ const Stopwatch = ({ secs = 0 }: StopWatchProps) => {
   }, [isRunning]);
 
   useEffect(() => {
-    incrementTime();
-  }, [elapsedSecs, incrementTime]);
+    const { displayDays, displayTime } = formatTime(elapsedSecs);
+    setStateDays(() => displayDays);
+    setStateTime(() => displayTime);
+  }, [elapsedSecs]);
 
   const toggleTimerOnOff = () => {
     setIsRunning((prev) => !prev);
