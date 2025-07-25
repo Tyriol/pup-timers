@@ -1,5 +1,5 @@
 import "./App.css";
-import Stopwatch from "./components/Stopwatch/Stopwatch";
+import Stopwatch from "./components/Timers/Stopwatch/Stopwatch";
 import type { Timer } from "./types/types";
 
 function App() {

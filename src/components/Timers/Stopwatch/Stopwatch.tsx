@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { formatTime } from "../../lib/timers";
-import type { Timer } from "../../types/types";
+import { formatTime } from "../../../lib/timers";
+import type { Timer } from "../../../types/types";
 interface StopWatchProps {
   timer: Timer;
 }
