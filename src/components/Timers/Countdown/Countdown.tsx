@@ -25,6 +25,7 @@ const Countdown = ({ timer }: CountdownProps) => {
   }, [isRunning]);
 
   useEffect(() => {
+    if (timeRemaining === 0) setIsRunning(false);
     const { displayDays, displayTime } = formatTime(timeRemaining);
     setStateDays(() => displayDays);
     setStateTime(() => displayTime);
@@ -45,9 +46,11 @@ const Countdown = ({ timer }: CountdownProps) => {
         <p>{timer.name}</p>
         <p>{stateDays}</p>
         <p>{stateTime}</p>
-        <button onClick={toggleTimerOnOff}>
-          {isRunning ? "Stop" : "Start"}
-        </button>
+        {timeRemaining > 0 ? (
+          <button onClick={toggleTimerOnOff}>
+            {isRunning ? "Stop" : "Start"}
+          </button>
+        ) : null}
         {!isRunning && elapsedSecs > 0 ? (
           <button onClick={resetElapsedTime}>Reset</button>
         ) : null}
