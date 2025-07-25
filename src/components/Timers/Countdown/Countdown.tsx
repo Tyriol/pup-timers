@@ -28,7 +28,7 @@ const Countdown = ({ timer }: CountdownProps) => {
     const { displayDays, displayTime } = formatTime(timeRemaining);
     setStateDays(() => displayDays);
     setStateTime(() => displayTime);
-  }, [elapsedSecs]);
+  }, [timeRemaining]);
 
   const toggleTimerOnOff = () => {
     setIsRunning((prev) => !prev);
