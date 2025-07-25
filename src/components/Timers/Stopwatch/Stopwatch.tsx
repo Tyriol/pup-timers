@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { formatTime } from "../../../lib/timers";
 import type { Timer } from "../../../types/types";
+import { TimersContext } from "../../../context/Context";
 interface StopWatchProps {
   timer: Timer;
 }
 
 const Stopwatch = ({ timer }: StopWatchProps) => {
+  const { updateTimer } = useContext(TimersContext);
   const [elapsedSecs, setElapsedSecs] = useState<number>(timer.elapsed);
   const [stateDays, setStateDays] = useState<string>("");
   const [stateTime, setStateTime] = useState<string>("");
@@ -21,17 +23,27 @@ const Stopwatch = ({ timer }: StopWatchProps) => {
   }, [isRunning]);
 
   useEffect(() => {
+    const updateElapsedSecsInStorage = async () => {
+      await updateTimer(timer.id, { elapsed: elapsedSecs });
+    };
+    void updateElapsedSecsInStorage();
+  }, [elapsedSecs, timer.id, updateTimer]);
+
+  useEffect(() => {
     const { displayDays, displayTime } = formatTime(elapsedSecs);
     setStateDays(() => displayDays);
     setStateTime(() => displayTime);
   }, [elapsedSecs]);
 
-  const toggleTimerOnOff = () => {
-    setIsRunning((prev) => !prev);
+  const toggleTimerOnOff = async () => {
+    const newIsRunning = !isRunning;
+    setIsRunning(newIsRunning);
+    await updateTimer(timer.id, { isRunning: newIsRunning });
   };
 
-  const resetElapsedTime = () => {
+  const resetElapsedTime = async () => {
     setElapsedSecs(0);
+    await updateTimer(timer.id, { elapsed: 0 });
   };
 
   return (
@@ -40,11 +52,11 @@ const Stopwatch = ({ timer }: StopWatchProps) => {
         <p>{timer.name}</p>
         <p>{stateDays}</p>
         <p>{stateTime}</p>
-        <button onClick={toggleTimerOnOff}>
+        <button onClick={() => void toggleTimerOnOff()}>
           {isRunning ? "Stop" : "Start"}
         </button>
         {!isRunning && elapsedSecs > 0 ? (
-          <button onClick={resetElapsedTime}>Reset</button>
+          <button onClick={() => void resetElapsedTime()}>Reset</button>
         ) : null}
       </div>
     </>
