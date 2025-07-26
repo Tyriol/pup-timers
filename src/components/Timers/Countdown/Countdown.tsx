@@ -1,11 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { formatTime } from "../../../lib/timers";
 import type { Timer } from "../../../types/types";
+import { TimersContext } from "../../../context/Context";
+
 interface CountdownProps {
   timer: Timer;
 }
 
 const Countdown = ({ timer }: CountdownProps) => {
+  const { updateTimer } = useContext(TimersContext);
   const [timeRemaining, setTimeRemaining] = useState<number>(
     timer.duration! - timer.elapsed,
   );
@@ -25,19 +28,29 @@ const Countdown = ({ timer }: CountdownProps) => {
   }, [isRunning]);
 
   useEffect(() => {
+    const updateElapsedSecsInStorage = async () => {
+      await updateTimer(timer.id, { elapsed: elapsedSecs });
+    };
+    void updateElapsedSecsInStorage();
+  }, [elapsedSecs, timer.id, updateTimer]);
+
+  useEffect(() => {
     if (timeRemaining === 0) setIsRunning(false);
     const { displayDays, displayTime } = formatTime(timeRemaining);
     setStateDays(() => displayDays);
     setStateTime(() => displayTime);
   }, [timeRemaining]);
 
-  const toggleTimerOnOff = () => {
-    setIsRunning((prev) => !prev);
+  const toggleTimerOnOff = async () => {
+    const newIsRunning = !isRunning;
+    setIsRunning(newIsRunning);
+    await updateTimer(timer.id, { isRunning: newIsRunning });
   };
 
-  const resetElapsedTime = () => {
+  const resetElapsedTime = async () => {
     setElapsedSecs(0);
     setTimeRemaining(timer.duration!);
+    await updateTimer(timer.id, { elapsed: 0 });
   };
 
   return (
@@ -47,12 +60,12 @@ const Countdown = ({ timer }: CountdownProps) => {
         <p>{stateDays}</p>
         <p>{stateTime}</p>
         {timeRemaining > 0 ? (
-          <button onClick={toggleTimerOnOff}>
+          <button onClick={() => void toggleTimerOnOff()}>
             {isRunning ? "Stop" : "Start"}
           </button>
         ) : null}
         {!isRunning && elapsedSecs > 0 ? (
-          <button onClick={resetElapsedTime}>Reset</button>
+          <button onClick={() => void resetElapsedTime()}>Reset</button>
         ) : null}
       </div>
     </>
