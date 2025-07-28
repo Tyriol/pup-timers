@@ -2,7 +2,7 @@ export interface Timer {
   type: "countdown" | "stopwatch";
   id: number;
   name: string;
-  duration: number;
+  duration?: number;
   elapsed: number;
   isRunning: boolean;
   startTime?: number;
