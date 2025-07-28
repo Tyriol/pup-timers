@@ -10,7 +10,7 @@ interface CountdownProps {
 const Countdown = ({ timer }: CountdownProps) => {
   const { updateTimer } = useContext(TimersContext);
   const [timeRemaining, setTimeRemaining] = useState<number>(
-    timer.duration! - timer.elapsed,
+    (timer.duration ?? 0) - timer.elapsed,
   );
   const [elapsedSecs, setElapsedSecs] = useState<number>(timer.elapsed);
   const [stateDays, setStateDays] = useState<string>("");
@@ -49,7 +49,7 @@ const Countdown = ({ timer }: CountdownProps) => {
 
   const resetElapsedTime = async () => {
     setElapsedSecs(0);
-    setTimeRemaining(timer.duration!);
+    setTimeRemaining(timer.duration ?? 0);
     await updateTimer(timer.id, { elapsed: 0 });
   };
 
