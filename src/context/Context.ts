@@ -3,6 +3,7 @@ import type { Timer, Dog, NewDog, NewTimer } from "../types/types";
 
 interface TimersContextValue {
   timersList: Timer[];
+  loading: boolean;
   addTimer: (timer: NewTimer) => Promise<number>;
   updateTimer: (id: number, timer: Partial<Timer>) => Promise<void>;
   deleteTimer: (id: number) => Promise<void>;
@@ -21,6 +22,7 @@ function throwProviderError(name: string): never {
 
 export const TimersContext = createContext<TimersContextValue>({
   timersList: [],
+  loading: true,
   addTimer: () =>
     Promise.reject(new Error("addTimer called outside of Provider")),
   updateTimer: () => throwProviderError("updateTimer"),
