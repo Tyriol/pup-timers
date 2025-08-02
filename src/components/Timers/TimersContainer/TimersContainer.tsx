@@ -1,10 +1,16 @@
-import { useContext, Suspense } from "react";
+import { useContext } from "react";
 import { TimersContext } from "../../../context/Context";
+// const Stopwatch = lazy(() => import("../Stopwatch/Stopwatch"));
+// const Countdown = lazy(() => import("../Countdown/Countdown"));
 import Stopwatch from "../Stopwatch/Stopwatch";
 import Countdown from "../Countdown/Countdown";
 
 const TimersContainer = () => {
-  const { timersList } = useContext(TimersContext);
+  const { timersList, loading } = useContext(TimersContext);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
 
   const displayedTimers = timersList.map((timer) =>
     timer.type === "stopwatch" ? (
@@ -14,14 +20,10 @@ const TimersContainer = () => {
     ),
   );
 
-  return (
-    <Suspense fallback={<p>Loading...</p>}>
-      {timersList.length === 0 ? (
-        <h2>Add a timer to see them here</h2>
-      ) : (
-        displayedTimers
-      )}
-    </Suspense>
+  return timersList.length === 0 ? (
+    <h2>Add a timer to see them here</h2>
+  ) : (
+    displayedTimers
   );
 };
 
