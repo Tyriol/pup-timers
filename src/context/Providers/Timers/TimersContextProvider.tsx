@@ -28,6 +28,7 @@ export const TimersProvider = ({ children }: TimersProviderProps) => {
     };
     fetchAndSetTimers().catch((error) => {
       console.error(error);
+      setLoading(false);
     });
   }, []);
 
