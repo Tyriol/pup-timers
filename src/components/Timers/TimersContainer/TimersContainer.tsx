@@ -23,7 +23,7 @@ const TimersContainer = () => {
   return timersList.length === 0 ? (
     <h2>Add a timer to see them here</h2>
   ) : (
-    displayedTimers
+    <div className="grid grid-cols-2">{displayedTimers}</div>
   );
 };
 
