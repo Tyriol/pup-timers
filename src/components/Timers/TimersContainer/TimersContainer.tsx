@@ -23,7 +23,7 @@ const TimersContainer = () => {
   return timersList.length === 0 ? (
     <h2>Add a timer to see them here</h2>
   ) : (
-    <div className="grid grid-cols-2">{displayedTimers}</div>
+    <div className="grid grid-cols-2 gap-4 py-8 w-80">{displayedTimers}</div>
   );
 };
 
