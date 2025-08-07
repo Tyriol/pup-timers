@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "cursed_timer_ulilregular";
+  src:
+    url("./assets/fonts/cursedtimerulil-aznm-webfont.woff2") format("woff2"),
+    url("./assets/fonts/cursedtimerulil-aznm-webfont.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -32,8 +41,8 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2em;
   width: 100dvw;
+  height: 100dvh;
 }
 
 button {
