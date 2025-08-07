@@ -48,10 +48,10 @@ const Stopwatch = ({ timer }: StopWatchProps) => {
 
   return (
     <>
-      <div className="flex flex-col items-center justify-center gap-5 p-20">
+      <div className="flex flex-col items-center justify-center gap-5 p-5 shadow-md shadow-indigo-500 rounded-md bg-neutral-700/50">
         <p>{timer.name}</p>
         <p>{stateDays}</p>
-        <p>{stateTime}</p>
+        <p className="time">{stateTime}</p>
         <button onClick={() => void toggleTimerOnOff()}>
           {isRunning ? "Stop" : "Start"}
         </button>
