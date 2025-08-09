@@ -4,7 +4,7 @@ import AddTimerButton from "./components/Buttons/AddTimerButton/AddTimerButton";
 
 function App() {
   return (
-    <div className="flex flex-col items-center justify-center w-full">
+    <div className="grid items-center justify-center w-full max-h-screen">
       <TimersContainer />
       <AddTimerButton />
     </div>
