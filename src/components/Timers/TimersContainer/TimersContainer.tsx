@@ -1,7 +1,5 @@
 import { useContext } from "react";
 import { TimersContext } from "../../../context/Context";
-// const Stopwatch = lazy(() => import("../Stopwatch/Stopwatch"));
-// const Countdown = lazy(() => import("../Countdown/Countdown"));
 import Stopwatch from "../Stopwatch/Stopwatch";
 import Countdown from "../Countdown/Countdown";
 
@@ -23,7 +21,9 @@ const TimersContainer = () => {
   return timersList.length === 0 ? (
     <h2>Add a timer to see them here</h2>
   ) : (
-    <div className="grid grid-cols-2 gap-4 py-8 w-80">{displayedTimers}</div>
+    <div className="grid grid-cols-2 gap-4 py-8 w-80 overflow-y-auto scroll-smooth">
+      {displayedTimers}
+    </div>
   );
 };
 
