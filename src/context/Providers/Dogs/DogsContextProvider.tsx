@@ -14,18 +14,22 @@ interface DogsProviderProps {
 
 export const DogsProvider = ({ children }: DogsProviderProps) => {
   const [dogsList, setDogsList] = useState<Dog[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchAndSetDogs = async () => {
       try {
         const allDogs = await getAllDogsFromLocalDb();
         setDogsList([...allDogs]);
+        setLoading(false);
       } catch (error) {
         console.error("error getting dogs:", error);
+        setLoading(false);
       }
     };
     fetchAndSetDogs().catch((error) => {
       console.error(error);
+      setLoading(false);
     });
   }, []);
 
@@ -79,6 +83,7 @@ export const DogsProvider = ({ children }: DogsProviderProps) => {
 
   const value = {
     dogsList,
+    loading,
     addDog,
     updateDog,
     deleteDog,

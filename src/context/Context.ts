@@ -11,6 +11,7 @@ interface TimersContextValue {
 
 interface DogsContextValue {
   dogsList: Dog[];
+  loading: boolean;
   addDog: (dog: NewDog) => Promise<number>;
   updateDog: (id: number, dog: Partial<Dog>) => Promise<void>;
   deleteDog: (id: number) => Promise<void>;
@@ -31,6 +32,7 @@ export const TimersContext = createContext<TimersContextValue>({
 
 export const DogsContext = createContext<DogsContextValue>({
   dogsList: [],
+  loading: true,
   addDog: () => Promise.reject(new Error("addDog called outside of Provider")),
   updateDog: () => throwProviderError("updateDog"),
   deleteDog: () => throwProviderError("deleteDog"),
