@@ -28,10 +28,12 @@ const Countdown = ({ timer }: CountdownProps) => {
   }, [isRunning]);
 
   useEffect(() => {
-    const updateElapsedSecsInStorage = async () => {
-      await updateTimer(timer.id, { elapsed: elapsedSecs });
-    };
-    void updateElapsedSecsInStorage();
+    if (elapsedSecs % 15 === 0) {
+      const updateElapsedSecsInStorage = async () => {
+        await updateTimer(timer.id, { elapsed: elapsedSecs });
+      };
+      void updateElapsedSecsInStorage();
+    }
   }, [elapsedSecs, timer.id, updateTimer]);
 
   useEffect(() => {
@@ -44,7 +46,10 @@ const Countdown = ({ timer }: CountdownProps) => {
   const toggleTimerOnOff = async () => {
     const newIsRunning = !isRunning;
     setIsRunning(newIsRunning);
-    await updateTimer(timer.id, { isRunning: newIsRunning });
+    await updateTimer(timer.id, {
+      isRunning: newIsRunning,
+      elapsed: elapsedSecs,
+    });
   };
 
   const resetElapsedTime = async () => {
