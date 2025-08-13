@@ -28,7 +28,7 @@ const Countdown = ({ timer }: CountdownProps) => {
   }, [isRunning]);
 
   useEffect(() => {
-    if (elapsedSecs % 15 === 0) {
+    if (elapsedSecs > 0 && elapsedSecs % 15 === 0) {
       const updateElapsedSecsInStorage = async () => {
         await updateTimer(timer.id, { elapsed: elapsedSecs });
       };
