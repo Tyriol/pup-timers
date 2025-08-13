@@ -52,13 +52,13 @@ describe("Countdown", () => {
     name: "Test Countdown",
     elapsed: 0,
     isRunning: false,
-    duration: 5,
+    duration: 30,
   };
 
   it("renders timer name and initial time", () => {
     renderWithContext(baseTimer);
     expect(screen.getByText("Test Countdown")).toBeInTheDocument();
-    expect(screen.getByText("00:00:05")).toBeInTheDocument();
+    expect(screen.getByText("00:00:30")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Start" })).toBeInTheDocument();
   });
 
@@ -71,7 +71,7 @@ describe("Countdown", () => {
     });
 
     // Simulate 3 seconds
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 15; i++) {
       await act(async () => {
         vi.advanceTimersByTime(1000);
       });
@@ -80,12 +80,13 @@ describe("Countdown", () => {
     // Should show "Stop" button now
     expect(screen.getByRole("button", { name: "Stop" })).toBeInTheDocument();
     // Should update timeRemaining
-    expect(screen.getByText("00:00:02")).toBeInTheDocument();
+    expect(screen.getByText("00:00:15")).toBeInTheDocument();
     // updateTimer should be called for isRunning and elapsed
-    expect(mockUpdateTimer).toHaveBeenCalledWith(1, { isRunning: true });
-    expect(mockUpdateTimer).toHaveBeenCalledWith(1, { elapsed: 1 });
-    expect(mockUpdateTimer).toHaveBeenCalledWith(1, { elapsed: 2 });
-    expect(mockUpdateTimer).toHaveBeenCalledWith(1, { elapsed: 3 });
+    expect(mockUpdateTimer).toHaveBeenCalledWith(1, {
+      isRunning: true,
+      elapsed: 0,
+    });
+    expect(mockUpdateTimer).toHaveBeenCalledWith(1, { elapsed: 15 });
   });
 
   it("stops countdown when Stop is clicked", async () => {
@@ -93,14 +94,21 @@ describe("Countdown", () => {
     const stopBtn = screen.getByRole("button", { name: "Stop" });
 
     await act(async () => {
-      fireEvent.click(stopBtn);
       vi.advanceTimersByTime(2000);
+    });
+
+    await act(async () => {
+      fireEvent.click(stopBtn);
     });
 
     // Should show "Start" button now
     expect(screen.getByRole("button", { name: "Start" })).toBeInTheDocument();
+    expect(screen.getByText("00:00:28")).toBeInTheDocument();
     // updateTimer should be called for isRunning
-    expect(mockUpdateTimer).toHaveBeenCalledWith(1, { isRunning: false });
+    expect(mockUpdateTimer).toHaveBeenCalledWith(1, {
+      isRunning: false,
+      elapsed: 2,
+    });
   });
 
   it("shows Reset button when stopped and elapsed > 0, and resets on click", async () => {
@@ -111,12 +119,12 @@ describe("Countdown", () => {
       fireEvent.click(screen.getByRole("button", { name: "Reset" }));
     });
 
-    expect(screen.getByText("00:00:05")).toBeInTheDocument();
+    expect(screen.getByText("00:00:30")).toBeInTheDocument();
     expect(mockUpdateTimer).toHaveBeenCalledWith(1, { elapsed: 0 });
   });
 
   it("shows Reset button when time remaining reaches 0", async () => {
-    renderWithContext({ ...baseTimer, isRunning: true, elapsed: 3 });
+    renderWithContext({ ...baseTimer, isRunning: true, elapsed: 28 });
     expect(screen.getByRole("button", { name: "Stop" })).toBeInTheDocument();
 
     for (let i = 0; i < 2; i++) {

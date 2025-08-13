@@ -69,8 +69,8 @@ describe("Stopwatch", () => {
       fireEvent.click(startBtn);
     });
 
-    // Simulate 3 seconds
-    for (let i = 0; i < 3; i++) {
+    // Simulate 15 seconds
+    for (let i = 0; i < 15; i++) {
       await act(async () => {
         vi.advanceTimersByTime(1000);
       });
@@ -79,12 +79,13 @@ describe("Stopwatch", () => {
     // Should show "Stop" button now
     expect(screen.getByRole("button", { name: "Stop" })).toBeInTheDocument();
     // Should update elapsed time
-    expect(screen.getByText("00:00:03")).toBeInTheDocument();
+    expect(screen.getByText("00:00:15")).toBeInTheDocument();
     // updateTimer should be called for isRunning and elapsed
-    expect(mockUpdateTimer).toHaveBeenCalledWith(1, { isRunning: true });
-    expect(mockUpdateTimer).toHaveBeenCalledWith(1, { elapsed: 1 });
-    expect(mockUpdateTimer).toHaveBeenCalledWith(1, { elapsed: 2 });
-    expect(mockUpdateTimer).toHaveBeenCalledWith(1, { elapsed: 3 });
+    expect(mockUpdateTimer).toHaveBeenCalledWith(1, {
+      isRunning: true,
+      elapsed: 0,
+    });
+    expect(mockUpdateTimer).toHaveBeenCalledWith(1, { elapsed: 15 });
   });
 
   it("stops timer when Stop is clicked", async () => {
@@ -99,7 +100,10 @@ describe("Stopwatch", () => {
     // Should show "Start" button now
     expect(screen.getByRole("button", { name: "Start" })).toBeInTheDocument();
     // updateTimer should be called for isRunning
-    expect(mockUpdateTimer).toHaveBeenCalledWith(1, { isRunning: false });
+    expect(mockUpdateTimer).toHaveBeenCalledWith(1, {
+      isRunning: false,
+      elapsed: 0,
+    });
   });
 
   it("shows Reset button when stopped and elapsed > 0, and resets on click", async () => {
