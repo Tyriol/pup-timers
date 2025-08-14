@@ -13,6 +13,8 @@ const Stopwatch = ({ timer }: StopWatchProps) => {
   const [stateTime, setStateTime] = useState<string>("");
   const [isRunning, setIsRunning] = useState<boolean>(timer.isRunning);
 
+  const timerCardClass = `flex flex-col items-center justify-center gap-5 p-5 shadow-md ${isRunning ? "shadow-green-500" : "shadow-indigo-500"} rounded-md bg-neutral-700/50`;
+
   useEffect(() => {
     if (isRunning) {
       const interval = setInterval(() => {
@@ -53,10 +55,7 @@ const Stopwatch = ({ timer }: StopWatchProps) => {
 
   return (
     <>
-      <div
-        onClick={() => void toggleTimerOnOff()}
-        className="flex flex-col items-center justify-center gap-5 p-5 shadow-md shadow-indigo-500 rounded-md bg-neutral-700/50"
-      >
+      <div onClick={() => void toggleTimerOnOff()} className={timerCardClass}>
         <p>{timer.name}</p>
         <p>{stateDays}</p>
         <p className="time">{stateTime}</p>
