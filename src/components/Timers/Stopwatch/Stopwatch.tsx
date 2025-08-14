@@ -53,13 +53,13 @@ const Stopwatch = ({ timer }: StopWatchProps) => {
 
   return (
     <>
-      <div className="flex flex-col items-center justify-center gap-5 p-5 shadow-md shadow-indigo-500 rounded-md bg-neutral-700/50">
+      <div
+        onClick={() => void toggleTimerOnOff()}
+        className="flex flex-col items-center justify-center gap-5 p-5 shadow-md shadow-indigo-500 rounded-md bg-neutral-700/50"
+      >
         <p>{timer.name}</p>
         <p>{stateDays}</p>
         <p className="time">{stateTime}</p>
-        <button onClick={() => void toggleTimerOnOff()}>
-          {isRunning ? "Stop" : "Start"}
-        </button>
         {!isRunning && elapsedSecs > 0 ? (
           <button onClick={() => void resetElapsedTime()}>Reset</button>
         ) : null}
