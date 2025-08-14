@@ -39,16 +39,16 @@ const Stopwatch = ({ timer }: StopWatchProps) => {
 
   const toggleTimerOnOff = async () => {
     const newIsRunning = !isRunning;
+    let updatedElapsedSecs = elapsedSecs;
+    if (!isRunning && elapsedSecs > 0) {
+      updatedElapsedSecs = 0;
+      setElapsedSecs(0);
+    }
     setIsRunning(newIsRunning);
     await updateTimer(timer.id, {
       isRunning: newIsRunning,
-      elapsed: elapsedSecs,
+      elapsed: updatedElapsedSecs,
     });
-  };
-
-  const resetElapsedTime = async () => {
-    setElapsedSecs(0);
-    await updateTimer(timer.id, { elapsed: 0 });
   };
 
   return (
@@ -60,9 +60,6 @@ const Stopwatch = ({ timer }: StopWatchProps) => {
         <p>{timer.name}</p>
         <p>{stateDays}</p>
         <p className="time">{stateTime}</p>
-        {!isRunning && elapsedSecs > 0 ? (
-          <button onClick={() => void resetElapsedTime()}>Reset</button>
-        ) : null}
       </div>
     </>
   );
