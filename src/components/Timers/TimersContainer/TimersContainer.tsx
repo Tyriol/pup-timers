@@ -21,7 +21,7 @@ const TimersContainer = () => {
   return timersList.length === 0 ? (
     <h2>Add a timer to see them here</h2>
   ) : (
-    <div className="grid grid-cols-2 gap-4 py-8 w-80 overflow-y-auto scroll-smooth">
+    <div className="grid grid-cols-2 gap-4 py-8 px-1 w-80 overflow-y-auto scroll-smooth">
       {displayedTimers}
     </div>
   );
