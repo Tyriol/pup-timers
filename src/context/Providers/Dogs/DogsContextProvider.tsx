@@ -27,10 +27,16 @@ export const DogsProvider = ({ children }: DogsProviderProps) => {
         setLoading(false);
       }
     };
+    let isMounted = true;
     fetchAndSetDogs().catch((error) => {
-      console.error(error);
-      setLoading(false);
+      if (isMounted) {
+        console.error(error);
+        setLoading(false);
+      }
     });
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const addDog = async (newDog: NewDog) => {
