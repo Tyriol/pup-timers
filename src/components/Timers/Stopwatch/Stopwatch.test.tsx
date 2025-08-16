@@ -20,6 +20,7 @@ const TimersProviderMock: React.FC<{ children: React.ReactNode }> = ({
   <TimersContext.Provider
     value={{
       timersList: [],
+      loading: true,
       addTimer: vi.fn(),
       updateTimer: mockUpdateTimer,
       deleteTimer: vi.fn(),
@@ -58,12 +59,16 @@ describe("Stopwatch", () => {
     renderWithContext(baseTimer);
     expect(screen.getByText("Test Timer")).toBeInTheDocument();
     expect(screen.getByText("00:00:00")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Start" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Test Timer 00:00:00" }),
+    ).toHaveClass("shadow-indigo-500");
   });
 
   it("starts timer and increments elapsed time", async () => {
     renderWithContext({ ...baseTimer, isRunning: false });
-    const startBtn = screen.getByRole("button", { name: "Start" });
+    const startBtn = screen.getByRole("button", {
+      name: "Test Timer 00:00:00",
+    });
 
     await act(async () => {
       fireEvent.click(startBtn);
@@ -77,7 +82,9 @@ describe("Stopwatch", () => {
     }
 
     // Should show "Stop" button now
-    expect(screen.getByRole("button", { name: "Stop" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Test Timer 00:00:15" }),
+    ).toHaveClass("shadow-green-500");
     // Should update elapsed time
     expect(screen.getByText("00:00:15")).toBeInTheDocument();
     // updateTimer should be called for isRunning and elapsed
@@ -90,7 +97,7 @@ describe("Stopwatch", () => {
 
   it("stops timer when Stop is clicked", async () => {
     renderWithContext({ ...baseTimer, isRunning: true });
-    const stopBtn = screen.getByRole("button", { name: "Stop" });
+    const stopBtn = screen.getByRole("button", { name: "Test Timer 00:00:00" });
 
     await act(async () => {
       fireEvent.click(stopBtn);
@@ -98,7 +105,9 @@ describe("Stopwatch", () => {
     });
 
     // Should show "Start" button now
-    expect(screen.getByRole("button", { name: "Start" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Test Timer 00:00:02" }),
+    ).toHaveClass("shadow-red-500");
     // updateTimer should be called for isRunning
     expect(mockUpdateTimer).toHaveBeenCalledWith(1, {
       isRunning: false,
@@ -108,14 +117,21 @@ describe("Stopwatch", () => {
 
   it("shows Reset button when stopped and elapsed > 0, and resets on click", async () => {
     renderWithContext({ ...baseTimer, isRunning: false, elapsed: 5 });
-    expect(screen.getByRole("button", { name: "Reset" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Test Timer 00:00:05" }),
+    ).toHaveClass("shadow-red-500");
 
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: "Reset" }));
+      fireEvent.click(
+        screen.getByRole("button", { name: "Test Timer 00:00:05" }),
+      );
     });
 
     expect(screen.getByText("00:00:00")).toBeInTheDocument();
-    expect(mockUpdateTimer).toHaveBeenCalledWith(1, { elapsed: 0 });
+    expect(mockUpdateTimer).toHaveBeenCalledWith(1, {
+      elapsed: 0,
+      isRunning: true,
+    });
   });
 
   it("cleans up interval on unmount", () => {
