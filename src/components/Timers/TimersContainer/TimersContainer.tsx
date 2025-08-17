@@ -1,7 +1,6 @@
 import { useContext } from "react";
 import { TimersContext } from "../../../context/Context";
 import Stopwatch from "../Stopwatch/Stopwatch";
-import Countdown from "../Countdown/Countdown";
 
 const TimersContainer = () => {
   const { timersList, loading } = useContext(TimersContext);
@@ -10,13 +9,9 @@ const TimersContainer = () => {
     return <p>Loading...</p>;
   }
 
-  const displayedTimers = timersList.map((timer) =>
-    timer.type === "stopwatch" ? (
-      <Stopwatch key={timer.id} timer={timer} />
-    ) : (
-      <Countdown key={timer.id} timer={timer} />
-    ),
-  );
+  const displayedTimers = timersList.map((timer) => (
+    <Stopwatch key={timer.id} timer={timer} />
+  ));
 
   return timersList.length === 0 ? (
     <h2>Add a timer to see them here</h2>
