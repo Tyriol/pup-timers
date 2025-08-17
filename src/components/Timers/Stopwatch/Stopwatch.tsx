@@ -2,12 +2,16 @@ import { useEffect, useState, useContext } from "react";
 import { formatTime } from "../../../lib/timers";
 import type { Timer } from "../../../types/types";
 import { TimersContext } from "../../../context/Context";
+
 interface StopWatchProps {
   timer: Timer;
 }
 
 const Stopwatch = ({ timer }: StopWatchProps) => {
   const { updateTimer } = useContext(TimersContext);
+  const [timeRemaining, setTimeRemaining] = useState<number>(
+    (timer.duration ?? 0) - timer.elapsed,
+  );
   const [elapsedSecs, setElapsedSecs] = useState<number>(timer.elapsed);
   const [stateDays, setStateDays] = useState<string>("");
   const [stateTime, setStateTime] = useState<string>("");
@@ -19,10 +23,13 @@ const Stopwatch = ({ timer }: StopWatchProps) => {
     if (isRunning) {
       const interval = setInterval(() => {
         setElapsedSecs((prev) => prev + 1);
+        if (timer.type === "countdown") {
+          setTimeRemaining((prev) => prev - 1);
+        }
       }, 1000);
       return () => clearInterval(interval);
     }
-  }, [isRunning]);
+  }, [isRunning, timer.type]);
 
   useEffect(() => {
     if (elapsedSecs > 0 && elapsedSecs % 15 === 0) {
@@ -34,10 +41,19 @@ const Stopwatch = ({ timer }: StopWatchProps) => {
   }, [elapsedSecs, timer.id, updateTimer]);
 
   useEffect(() => {
-    const { displayDays, displayTime } = formatTime(elapsedSecs);
+    if (timer.type === "countdown" && timeRemaining === 0) {
+      setIsRunning(false);
+      const updateTimerInStorage = async () => {
+        await updateTimer(timer.id, { elapsed: elapsedSecs, isRunning: false });
+      };
+      void updateTimerInStorage();
+    }
+    const timeToFormat =
+      timer.type === "stopwatch" ? elapsedSecs : timeRemaining;
+    const { displayDays, displayTime } = formatTime(timeToFormat);
     setStateDays(() => displayDays);
     setStateTime(() => displayTime);
-  }, [elapsedSecs]);
+  }, [elapsedSecs, timeRemaining, timer.type, updateTimer, timer.id]);
 
   const toggleTimerOnOff = async () => {
     const newIsRunning = !isRunning;
@@ -45,6 +61,9 @@ const Stopwatch = ({ timer }: StopWatchProps) => {
     if (!isRunning && elapsedSecs > 0) {
       updatedElapsedSecs = 0;
       setElapsedSecs(0);
+      if (timer.type === "countdown") {
+        setTimeRemaining(timer.duration ?? 0);
+      }
     }
     setIsRunning(newIsRunning);
     await updateTimer(timer.id, {
