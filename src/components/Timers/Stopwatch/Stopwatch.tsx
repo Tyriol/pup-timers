@@ -55,7 +55,7 @@ const Stopwatch = ({ timer }: StopWatchProps) => {
 
   return (
     <button onClick={() => void toggleTimerOnOff()} className={timerCardClass}>
-      <h2 className="inline-block h-[2em] align-middle leading-none">
+      <h2 className="flex items-center justify-center h-[2em] leading-none">
         {timer.name}
       </h2>
       <div className="text-center">
