@@ -24,7 +24,10 @@ const AddTimerButton = () => {
   };
 
   return (
-    <button onClick={() => void handleAddTimer()} className="w-full max-w-md">
+    <button
+      onClick={() => void handleAddTimer()}
+      className="bg-yellow-700 w-full max-w-md"
+    >
       +
     </button>
   );
