@@ -17,25 +17,24 @@ export const DogsProvider = ({ children }: DogsProviderProps) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    const controller = new AbortController();
     const fetchAndSetDogs = async () => {
       try {
         const allDogs = await getAllDogsFromLocalDb();
-        setDogsList([...allDogs]);
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setDogsList([...allDogs]);
+          setLoading(false);
+        }
       } catch (error) {
-        console.error("error getting dogs:", error);
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          console.error("error getting dogs:", error);
+          setLoading(false);
+        }
       }
     };
-    let isMounted = true;
-    fetchAndSetDogs().catch((error) => {
-      if (isMounted) {
-        console.error(error);
-        setLoading(false);
-      }
-    });
+    void fetchAndSetDogs();
     return () => {
-      isMounted = false;
+      controller.abort();
     };
   }, []);
 
