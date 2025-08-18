@@ -3,11 +3,11 @@ import { formatTime } from "../../../lib/timers";
 import type { Timer } from "../../../types/types";
 import { TimersContext } from "../../../context/Context";
 
-interface StopWatchProps {
+interface TimerProps {
   timer: Timer;
 }
 
-const Stopwatch = ({ timer }: StopWatchProps) => {
+const TimerDisplay = ({ timer }: TimerProps) => {
   const { updateTimer } = useContext(TimersContext);
   const [timeRemaining, setTimeRemaining] = useState<number>(
     (timer.duration ?? 0) - timer.elapsed,
@@ -85,4 +85,4 @@ const Stopwatch = ({ timer }: StopWatchProps) => {
   );
 };
 
-export default Stopwatch;
+export default TimerDisplay;

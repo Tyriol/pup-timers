@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { TimersContext } from "../../../context/Context";
-import Stopwatch from "../Stopwatch/Stopwatch";
+import TimerDisplay from "../Timer/TimerDisplay";
 
 const TimersContainer = () => {
   const { timersList, loading } = useContext(TimersContext);
@@ -10,7 +10,7 @@ const TimersContainer = () => {
   }
 
   const displayedTimers = timersList.map((timer) => (
-    <Stopwatch key={timer.id} timer={timer} />
+    <TimerDisplay key={timer.id} timer={timer} />
   ));
 
   return timersList.length === 0 ? (

@@ -1,6 +1,6 @@
 import { describe, it, vi, beforeEach, afterEach, expect } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
-import Stopwatch from "./Stopwatch";
+import TimerDisplay from "./TimerDisplay";
 import { TimersContext } from "../../../context/Context";
 import type { Timer } from "../../../types/types";
 
@@ -33,7 +33,7 @@ const TimersProviderMock: React.FC<{ children: React.ReactNode }> = ({
 const renderWithContext = (timer: Timer) =>
   render(
     <TimersProviderMock>
-      <Stopwatch timer={timer} />
+      <TimerDisplay timer={timer} />
     </TimersProviderMock>,
   );
 
