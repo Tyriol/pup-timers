@@ -17,7 +17,17 @@ const TimerDisplay = ({ timer }: TimerProps) => {
   const [stateTime, setStateTime] = useState<string>("");
   const [isRunning, setIsRunning] = useState<boolean>(timer.isRunning);
 
-  const timerCardClass = `flex flex-col items-center justify-center gap-5 p-5 shadow-md ${isRunning ? "shadow-green-500" : !isRunning && elapsedSecs > 0 ? "shadow-red-500" : "shadow-indigo-500"} rounded-md bg-neutral-700/50`;
+  const getShadowColourClass = (isRunning: boolean, elapsedSecs: number) => {
+    if (isRunning) {
+      return "shadow-green-500";
+    } else if (!isRunning && elapsedSecs > 0) {
+      return "shadow-red-500";
+    } else {
+      return "shadow-indigo-500";
+    }
+  };
+
+  const timerCardClass = `flex flex-col items-center justify-center gap-5 p-5 shadow-md ${getShadowColourClass(isRunning, elapsedSecs)} rounded-md bg-neutral-700/50`;
 
   useEffect(() => {
     if (isRunning) {
