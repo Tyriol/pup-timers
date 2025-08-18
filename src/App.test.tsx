@@ -10,7 +10,7 @@ describe("App", () => {
     indexedDB = new IDBFactory();
   });
 
-  it("renders the title correctly", () => {
+  it("renders the add timer button", () => {
     render(
       <DogsProvider>
         <TimersProvider>
@@ -18,7 +18,7 @@ describe("App", () => {
         </TimersProvider>
       </DogsProvider>,
     );
-    const headingElement = screen.getByText("Pup Timers!");
-    expect(headingElement).toBeInTheDocument();
+    const addTimerButton = screen.getByText("+");
+    expect(addTimerButton).toBeInTheDocument();
   });
 });

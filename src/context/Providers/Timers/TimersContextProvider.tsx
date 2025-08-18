@@ -14,18 +14,21 @@ interface TimersProviderProps {
 
 export const TimersProvider = ({ children }: TimersProviderProps) => {
   const [timersList, setTimersList] = useState<Timer[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchAndSetTimers = async () => {
       try {
         const allTimers = await getAllTimersFromLocalDb();
         setTimersList([...allTimers]);
+        setLoading(false);
       } catch (error) {
         console.error("error getting timers:", error);
       }
     };
     fetchAndSetTimers().catch((error) => {
       console.error(error);
+      setLoading(false);
     });
   }, []);
 
@@ -81,6 +84,7 @@ export const TimersProvider = ({ children }: TimersProviderProps) => {
 
   const value = {
     timersList,
+    loading,
     addTimer,
     updateTimer,
     deleteTimer,
