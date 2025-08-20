@@ -7,7 +7,8 @@ const db = new Dexie("PupTimersDatabase") as Dexie & {
 };
 
 db.version(1).stores({
-  timers: "++id, type, name, duration, elapsed, isRunning, startTime, endTime",
+  timers:
+    "++id, type, name, duration, elapsed, isRunning, startTime, updatedAt, endTime",
   dogs: "++id, name, breed, age",
 });
 
