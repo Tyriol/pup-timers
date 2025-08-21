@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import { formatTime } from "../../../lib/timers";
+import { formatTime, calculateElapsedTime } from "../../../lib/timers";
 import type { Timer } from "../../../types/types";
 import { TimersContext } from "../../../context/Context";
 
@@ -28,6 +28,24 @@ const TimerDisplay = ({ timer }: TimerProps) => {
   };
 
   const timerCardClass = `flex flex-col items-center justify-center gap-5 p-5 shadow-md ${getShadowColourClass(isRunning, elapsedSecs)} rounded-md bg-neutral-700/50`;
+
+  useEffect(() => {
+    const calculateAndSetTimeElapsedWhileOffline = async () => {
+      if (isRunning && timer.updatedAt) {
+        const newElapsedSecs = calculateElapsedTime(
+          Date.now(),
+          elapsedSecs,
+          timer.updatedAt,
+        );
+        setElapsedSecs(newElapsedSecs);
+        await updateTimer(timer.id, {
+          elapsed: newElapsedSecs,
+          updatedAt: Date.now(),
+        });
+      }
+    };
+    void calculateAndSetTimeElapsedWhileOffline();
+  }, []);
 
   useEffect(() => {
     if (isRunning) {
