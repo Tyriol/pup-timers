@@ -116,7 +116,6 @@ describe("Timer Dexie IndexedDb utility functions", () => {
       isRunning: false,
       type: "countdown",
       elapsed: 0,
-      startTime: undefined,
       endTime: undefined,
     };
 
@@ -131,7 +130,6 @@ describe("Timer Dexie IndexedDb utility functions", () => {
       isRunning: false,
       type: "stopwatch",
       elapsed: 0,
-      startTime: undefined,
       endTime: undefined,
     };
 
@@ -155,7 +153,6 @@ describe("Timer Dexie IndexedDb utility functions", () => {
       isRunning: false,
       type: "stopwatch",
       elapsed: 0,
-      startTime: undefined,
       endTime: undefined,
     };
 
@@ -174,7 +171,6 @@ describe("Timer Dexie IndexedDb utility functions", () => {
       isRunning: false,
       type: "stopwatch",
       elapsed: 0,
-      startTime: undefined,
       endTime: undefined,
     };
 
@@ -184,7 +180,6 @@ describe("Timer Dexie IndexedDb utility functions", () => {
       isRunning: false,
       type: "countdown",
       elapsed: 0,
-      startTime: undefined,
       endTime: undefined,
     };
 
@@ -194,7 +189,6 @@ describe("Timer Dexie IndexedDb utility functions", () => {
       isRunning: false,
       type: "stopwatch",
       elapsed: 0,
-      startTime: undefined,
       endTime: undefined,
     };
 
