@@ -31,5 +31,5 @@ export const calculateElapsedTime = (
   elapsedSecs: number,
   updateAt: number,
 ) => {
-  return (currentTime - updateAt + elapsedSecs * 1000) / 1000;
+  return Math.floor((currentTime - updateAt + elapsedSecs * 1000) / 1000);
 };
