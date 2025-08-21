@@ -8,7 +8,7 @@ describe("The timer utility functions", () => {
   });
 
   afterAll(() => {
-    vi.useRealTimers;
+    vi.useRealTimers();
   });
 
   it("converts seconds to days and remaining hours, minutes and seconds correctly", () => {
