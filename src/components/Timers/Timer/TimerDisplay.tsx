@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import { formatTime } from "../../../lib/timers";
+import { formatTime, calculateElapsedTime } from "../../../lib/timers";
 import type { Timer } from "../../../types/types";
 import { TimersContext } from "../../../context/Context";
 
@@ -30,6 +30,26 @@ const TimerDisplay = ({ timer }: TimerProps) => {
   const timerCardClass = `flex flex-col items-center justify-center gap-5 p-5 shadow-md ${getShadowColourClass(isRunning, elapsedSecs)} rounded-md bg-neutral-700/50`;
 
   useEffect(() => {
+    const calculateAndSetTimeElapsedWhileOffline = async () => {
+      if (isRunning && timer.updatedAt) {
+        const newElapsedSecs = calculateElapsedTime(
+          Date.now(),
+          elapsedSecs,
+          timer.updatedAt,
+        );
+        setElapsedSecs(newElapsedSecs);
+        if (timer.type === "countdown" && timer.duration)
+          setTimeRemaining(timer.duration - newElapsedSecs);
+        await updateTimer(timer.id, {
+          elapsed: newElapsedSecs,
+          updatedAt: Date.now(),
+        });
+      }
+    };
+    void calculateAndSetTimeElapsedWhileOffline();
+  }, []);
+
+  useEffect(() => {
     if (isRunning) {
       const interval = setInterval(() => {
         setElapsedSecs((prev) => prev + 1);
@@ -44,7 +64,10 @@ const TimerDisplay = ({ timer }: TimerProps) => {
   useEffect(() => {
     if (elapsedSecs > 0 && elapsedSecs % 15 === 0) {
       const updateElapsedSecsInStorage = async () => {
-        await updateTimer(timer.id, { elapsed: elapsedSecs });
+        await updateTimer(timer.id, {
+          elapsed: elapsedSecs,
+          updatedAt: Date.now(),
+        });
       };
       void updateElapsedSecsInStorage();
     }
@@ -54,7 +77,11 @@ const TimerDisplay = ({ timer }: TimerProps) => {
     if (timer.type === "countdown" && timeRemaining === 0) {
       setIsRunning(false);
       const updateTimerInStorage = async () => {
-        await updateTimer(timer.id, { elapsed: elapsedSecs, isRunning: false });
+        await updateTimer(timer.id, {
+          elapsed: elapsedSecs,
+          isRunning: false,
+          updatedAt: Date.now(),
+        });
       };
       void updateTimerInStorage();
     }
@@ -79,6 +106,10 @@ const TimerDisplay = ({ timer }: TimerProps) => {
     await updateTimer(timer.id, {
       isRunning: newIsRunning,
       elapsed: updatedElapsedSecs,
+      updatedAt: Date.now(),
+      ...(!isRunning && updatedElapsedSecs === 0
+        ? { startTime: Date.now() }
+        : {}),
     });
   };
 

@@ -9,7 +9,6 @@ const AddTimerButton = () => {
     type: "stopwatch",
     elapsed: 0,
     isRunning: false,
-    startTime: undefined,
     endTime: undefined,
     name: "Next wee",
     duration: 300,

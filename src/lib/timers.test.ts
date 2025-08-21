@@ -1,7 +1,16 @@
-import { describe, it, expect } from "vitest";
-import { getTimeFromSeconds, formatTime } from "./timers";
+import { describe, it, expect, vi, beforeAll, afterAll } from "vitest";
+import { getTimeFromSeconds, formatTime, calculateElapsedTime } from "./timers";
 
 describe("The timer utility functions", () => {
+  beforeAll(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2025-08-21T10:00:00Z"));
+  });
+
+  afterAll(() => {
+    vi.useRealTimers();
+  });
+
   it("converts seconds to days and remaining hours, minutes and seconds correctly", () => {
     const { days, hours, minutes, seconds } = getTimeFromSeconds(93825);
     expect(days).toBe(1);
@@ -26,5 +35,14 @@ describe("The timer utility functions", () => {
     const { displayDays, displayTime } = formatTime(930010);
     expect(displayTime).toBe("18:20:10");
     expect(displayDays).toBe("10 days");
+  });
+
+  it("calculates the current time elapsed", () => {
+    const currentTime = new Date("2025-08-21T10:00:00Z").getTime();
+    const updatedAt = currentTime - 500000;
+    const elapsedSecs = 57;
+
+    const elapsed = calculateElapsedTime(currentTime, elapsedSecs, updatedAt);
+    expect(elapsed).toBe(557);
   });
 });

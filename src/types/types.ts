@@ -6,10 +6,11 @@ export interface Timer {
   elapsed: number;
   isRunning: boolean;
   startTime?: number;
+  updatedAt?: number;
   endTime?: number;
 }
 
-export type NewTimer = Omit<Timer, "id">;
+export type NewTimer = Omit<Timer, "id" | "startTime">;
 
 export interface Dog {
   id: number;
