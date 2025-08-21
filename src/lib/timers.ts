@@ -25,3 +25,11 @@ export const formatTime = (secs: number) => {
     displayTime: `${displayHours}:${displayMinutes}:${displaySeconds}`,
   };
 };
+
+export const calculateElapsedTime = (
+  currentTime: number,
+  elapsedSecs: number,
+  updateAt: number,
+) => {
+  return (currentTime - updateAt + elapsedSecs * 1000) / 1000;
+};
