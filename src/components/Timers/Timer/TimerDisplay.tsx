@@ -38,6 +38,8 @@ const TimerDisplay = ({ timer }: TimerProps) => {
           timer.updatedAt,
         );
         setElapsedSecs(newElapsedSecs);
+        if (timer.type === "countdown" && timer.duration)
+          setTimeRemaining(timer.duration - newElapsedSecs);
         await updateTimer(timer.id, {
           elapsed: newElapsedSecs,
           updatedAt: Date.now(),
