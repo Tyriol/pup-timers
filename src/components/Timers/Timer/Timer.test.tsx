@@ -10,6 +10,11 @@ vi.mock("../../../lib/timers", () => ({
     displayDays: secs >= 86400 ? `${Math.floor(secs / 86400)}d` : "",
     displayTime: new Date(secs * 1000).toISOString().substring(11, 19),
   }),
+  calculateElapsedTime: (
+    currentTime: number,
+    elapsed: number,
+    updatedAt: number,
+  ) => Math.floor((currentTime - updatedAt + elapsed * 1000) / 1000),
 }));
 
 const mockUpdateTimer = vi.fn(() => Promise.resolve());
@@ -63,6 +68,21 @@ describe("Stopwatch", () => {
     expect(
       screen.getByRole("button", { name: "Test Stopwatch 00:00:00" }),
     ).toHaveClass("shadow-indigo-500");
+  });
+
+  it("calculates elapsed time and renders the correct time display", async () => {
+    const currentTime = new Date("2025-08-21T10:00:00Z").getTime();
+    renderWithContext({
+      ...baseTimer,
+      isRunning: true,
+      elapsed: 15,
+      updatedAt: currentTime - 1000000,
+    });
+    expect(screen.getByText("00:16:55")).toBeInTheDocument();
+    expect(mockUpdateTimer).toHaveBeenCalledWith(1, {
+      elapsed: 1015,
+      updatedAt: currentTime,
+    });
   });
 
   it("starts timer and increments elapsed time", async () => {
@@ -182,6 +202,21 @@ describe("Countdown", () => {
     expect(
       screen.getByRole("button", { name: "Test Countdown 00:00:30" }),
     ).toHaveClass("shadow-indigo-500");
+  });
+
+  it("calculates elapsed time and renders the correct time display", async () => {
+    const currentTime = new Date("2025-08-21T10:00:00Z").getTime();
+    renderWithContext({
+      ...baseTimer,
+      isRunning: true,
+      elapsed: 5,
+      updatedAt: currentTime - 12000,
+    });
+    expect(screen.getByText("00:00:13")).toBeInTheDocument();
+    expect(mockUpdateTimer).toHaveBeenCalledWith(1, {
+      elapsed: 17,
+      updatedAt: currentTime,
+    });
   });
 
   it("starts countdown and decrements timeRemaining", async () => {
