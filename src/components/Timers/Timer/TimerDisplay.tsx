@@ -44,7 +44,10 @@ const TimerDisplay = ({ timer }: TimerProps) => {
   useEffect(() => {
     if (elapsedSecs > 0 && elapsedSecs % 15 === 0) {
       const updateElapsedSecsInStorage = async () => {
-        await updateTimer(timer.id, { elapsed: elapsedSecs });
+        await updateTimer(timer.id, {
+          elapsed: elapsedSecs,
+          updatedAt: Date.now(),
+        });
       };
       void updateElapsedSecsInStorage();
     }
@@ -54,7 +57,11 @@ const TimerDisplay = ({ timer }: TimerProps) => {
     if (timer.type === "countdown" && timeRemaining === 0) {
       setIsRunning(false);
       const updateTimerInStorage = async () => {
-        await updateTimer(timer.id, { elapsed: elapsedSecs, isRunning: false });
+        await updateTimer(timer.id, {
+          elapsed: elapsedSecs,
+          isRunning: false,
+          updatedAt: Date.now(),
+        });
       };
       void updateTimerInStorage();
     }
@@ -79,6 +86,10 @@ const TimerDisplay = ({ timer }: TimerProps) => {
     await updateTimer(timer.id, {
       isRunning: newIsRunning,
       elapsed: updatedElapsedSecs,
+      updatedAt: Date.now(),
+      ...(!isRunning && updatedElapsedSecs === 0
+        ? { startTime: Date.now() }
+        : {}),
     });
   };
 
