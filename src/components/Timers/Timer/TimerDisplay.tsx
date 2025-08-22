@@ -32,14 +32,31 @@ const TimerDisplay = ({ timer }: TimerProps) => {
   useEffect(() => {
     const calculateAndSetTimeElapsedWhileOffline = async () => {
       if (isRunning && timer.updatedAt) {
-        const newElapsedSecs = calculateElapsedTime(
+        const newElapsedSecs: number = calculateElapsedTime(
           Date.now(),
           elapsedSecs,
           timer.updatedAt,
         );
-        setElapsedSecs(newElapsedSecs);
-        if (timer.type === "countdown" && timer.duration)
-          setTimeRemaining(timer.duration - newElapsedSecs);
+        if (timer.type === "countdown" && timer.duration) {
+          const calculatedTimeRemaining = timer.duration - newElapsedSecs;
+          setElapsedSecs(
+            calculatedTimeRemaining < 0 ? timer.duration : newElapsedSecs,
+          );
+          setTimeRemaining(
+            calculatedTimeRemaining < 0 ? 0 : calculatedTimeRemaining,
+          );
+          if (calculatedTimeRemaining <= 0) {
+            setIsRunning(false);
+            await updateTimer(timer.id, {
+              elapsed: timer.duration,
+              isRunning: false,
+              updatedAt: Date.now(),
+            });
+            return;
+          }
+        } else {
+          setElapsedSecs(newElapsedSecs);
+        }
         await updateTimer(timer.id, {
           elapsed: newElapsedSecs,
           updatedAt: Date.now(),
@@ -62,7 +79,7 @@ const TimerDisplay = ({ timer }: TimerProps) => {
   }, [isRunning, timer.type]);
 
   useEffect(() => {
-    if (elapsedSecs > 0 && elapsedSecs % 15 === 0) {
+    if (isRunning && elapsedSecs > 0 && elapsedSecs % 15 === 0) {
       const updateElapsedSecsInStorage = async () => {
         await updateTimer(timer.id, {
           elapsed: elapsedSecs,
@@ -71,10 +88,10 @@ const TimerDisplay = ({ timer }: TimerProps) => {
       };
       void updateElapsedSecsInStorage();
     }
-  }, [elapsedSecs, timer.id, updateTimer]);
+  }, [isRunning, elapsedSecs, timer.id, updateTimer]);
 
   useEffect(() => {
-    if (timer.type === "countdown" && timeRemaining === 0) {
+    if (timer.type === "countdown" && isRunning && timeRemaining === 0) {
       setIsRunning(false);
       const updateTimerInStorage = async () => {
         await updateTimer(timer.id, {
@@ -85,12 +102,15 @@ const TimerDisplay = ({ timer }: TimerProps) => {
       };
       void updateTimerInStorage();
     }
+  }, [timeRemaining, timer.type, isRunning, timer.id]);
+
+  useEffect(() => {
     const timeToFormat =
       timer.type === "stopwatch" ? elapsedSecs : timeRemaining;
     const { displayDays, displayTime } = formatTime(timeToFormat);
     setStateDays(() => displayDays);
     setStateTime(() => displayTime);
-  }, [elapsedSecs, timeRemaining, timer.type, updateTimer, timer.id]);
+  }, [elapsedSecs, timeRemaining, timer.type]);
 
   const toggleTimerOnOff = async () => {
     const newIsRunning = !isRunning;
