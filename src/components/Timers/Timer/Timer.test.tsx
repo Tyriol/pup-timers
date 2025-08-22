@@ -219,6 +219,25 @@ describe("Countdown", () => {
     });
   });
 
+  it("stops the timer if it hit the duration while offline", async () => {
+    const currentTime = new Date("2025-08-21T10:00:00Z").getTime();
+    renderWithContext({
+      ...baseTimer,
+      isRunning: true,
+      elapsed: 5,
+      updatedAt: currentTime - 100000,
+    });
+    expect(screen.getByText("00:00:00")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Test Countdown 00:00:00" }),
+    ).toHaveClass("shadow-red-500");
+    expect(mockUpdateTimer).toHaveBeenCalledWith(1, {
+      elapsed: 30,
+      updatedAt: currentTime,
+      isRunning: false,
+    });
+  });
+
   it("starts countdown and decrements timeRemaining", async () => {
     renderWithContext({ ...baseTimer, isRunning: false });
     const currentTime = new Date("2025-08-21T10:00:00Z").getTime();
