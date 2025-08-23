@@ -37,7 +37,7 @@ describe("The timer utility functions", () => {
     expect(displayDays).toBe("10 days");
   });
 
-  it("calculates the current time elapsed", () => {
+  it("returns the time elapsed since start", () => {
     const currentTime = new Date("2025-08-21T10:00:00Z").getTime();
     const startTime = currentTime - 500000;
 
