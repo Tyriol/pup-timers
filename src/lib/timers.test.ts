@@ -39,10 +39,16 @@ describe("The timer utility functions", () => {
 
   it("calculates the current time elapsed", () => {
     const currentTime = new Date("2025-08-21T10:00:00Z").getTime();
-    const updatedAt = currentTime - 500000;
-    const elapsedSecs = 57;
+    const startTime = currentTime - 500000;
 
-    const elapsed = calculateElapsedTime(currentTime, elapsedSecs, updatedAt);
-    expect(elapsed).toBe(557);
+    const elapsed = calculateElapsedTime(currentTime, startTime);
+    expect(elapsed).toBe(500);
+  });
+
+  it("doesn't break if start time is after current time", () => {
+    const currentTime = new Date("2025-08-21T10:00:00Z").getTime();
+    const startTime = currentTime + 1;
+    const elapsed = calculateElapsedTime(currentTime, startTime);
+    expect(elapsed).toBe(0);
   });
 });
