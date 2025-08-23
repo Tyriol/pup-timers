@@ -8,13 +8,12 @@ import type { Timer } from "../../../types/types";
 vi.mock("../../../lib/timers", () => ({
   formatTime: (secs: number) => ({
     displayDays: secs >= 86400 ? `${Math.floor(secs / 86400)}d` : "",
-    displayTime: new Date(secs * 1000).toISOString().substring(11, 19),
+    displayTime: new Date(Math.max(0, secs) * 1000)
+      .toISOString()
+      .substring(11, 19),
   }),
-  calculateElapsedTime: (
-    currentTime: number,
-    elapsed: number,
-    updatedAt: number,
-  ) => Math.floor((currentTime - updatedAt + elapsed * 1000) / 1000),
+  calculateElapsedTime: (currentTime: number, startTime: number) =>
+    Math.max(0, Math.floor((currentTime - startTime) / 1000)),
 }));
 
 const mockUpdateTimer = vi.fn(() => Promise.resolve());
@@ -76,11 +75,11 @@ describe("Stopwatch", () => {
       ...baseTimer,
       isRunning: true,
       elapsed: 15,
-      updatedAt: currentTime - 1000000,
+      startTime: currentTime - 1000000,
     });
-    expect(screen.getByText("00:16:55")).toBeInTheDocument();
+    expect(screen.getByText("00:16:40")).toBeInTheDocument();
     expect(mockUpdateTimer).toHaveBeenCalledWith(1, {
-      elapsed: 1015,
+      elapsed: 1000,
       updatedAt: currentTime,
     });
   });
@@ -210,11 +209,11 @@ describe("Countdown", () => {
       ...baseTimer,
       isRunning: true,
       elapsed: 5,
-      updatedAt: currentTime - 12000,
+      startTime: currentTime - 8000,
     });
-    expect(screen.getByText("00:00:13")).toBeInTheDocument();
+    expect(screen.getByText("00:00:22")).toBeInTheDocument();
     expect(mockUpdateTimer).toHaveBeenCalledWith(1, {
-      elapsed: 17,
+      elapsed: 8,
       updatedAt: currentTime,
     });
   });
@@ -225,7 +224,7 @@ describe("Countdown", () => {
       ...baseTimer,
       isRunning: true,
       elapsed: 5,
-      updatedAt: currentTime - 100000,
+      startTime: currentTime - 100000,
     });
     expect(screen.getByText("00:00:00")).toBeInTheDocument();
     expect(

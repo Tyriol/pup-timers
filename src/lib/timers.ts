@@ -28,8 +28,7 @@ export const formatTime = (secs: number) => {
 
 export const calculateElapsedTime = (
   currentTime: number,
-  elapsedSecs: number,
-  updateAt: number,
+  startTime: number,
 ) => {
-  return Math.floor((currentTime - updateAt + elapsedSecs * 1000) / 1000);
+  return Math.max(0, Math.floor((currentTime - startTime) / 1000));
 };
