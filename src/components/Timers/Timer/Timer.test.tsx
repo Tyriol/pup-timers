@@ -13,7 +13,7 @@ vi.mock("../../../lib/timers", () => ({
       .substring(11, 19),
   }),
   calculateElapsedTime: (currentTime: number, startTime: number) =>
-    Math.max(Math.floor((currentTime - startTime) / 1000)),
+    Math.max(0, Math.floor((currentTime - startTime) / 1000)),
 }));
 
 const mockUpdateTimer = vi.fn(() => Promise.resolve());
