@@ -32,11 +32,10 @@ const TimerDisplay = ({ timer }: TimerProps) => {
   useEffect(() => {
     if (document.visibilityState === "visible") {
       const calculateAndSetTimeElapsedWhileOffline = async () => {
-        if (isRunning && timer.updatedAt) {
+        if (isRunning && timer.startTime) {
           const newElapsedSecs: number = calculateElapsedTime(
             Date.now(),
-            elapsedSecs,
-            timer.updatedAt,
+            timer.startTime,
           );
           if (timer.type === "countdown" && timer.duration) {
             const calculatedTimeRemaining = timer.duration - newElapsedSecs;
