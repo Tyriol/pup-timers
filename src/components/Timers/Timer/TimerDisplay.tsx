@@ -64,7 +64,7 @@ const TimerDisplay = ({ timer }: TimerProps) => {
       }
     };
     void calculateAndSetTimeElapsedWhileOffline();
-  }, []);
+  }, [document.visibilityState]);
 
   useEffect(() => {
     if (isRunning) {
