@@ -30,40 +30,43 @@ const TimerDisplay = ({ timer }: TimerProps) => {
   const timerCardClass = `flex flex-col items-center justify-center gap-5 p-5 shadow-md ${getShadowColourClass(isRunning, elapsedSecs)} rounded-md bg-neutral-700/50`;
 
   useEffect(() => {
-    const calculateAndSetTimeElapsedWhileOffline = async () => {
-      if (isRunning && timer.updatedAt) {
-        const newElapsedSecs: number = calculateElapsedTime(
-          Date.now(),
-          elapsedSecs,
-          timer.updatedAt,
-        );
-        if (timer.type === "countdown" && timer.duration) {
-          const calculatedTimeRemaining = timer.duration - newElapsedSecs;
-          setElapsedSecs(
-            calculatedTimeRemaining < 0 ? timer.duration : newElapsedSecs,
+    if (document.visibilityState === "visible") {
+      const calculateAndSetTimeElapsedWhileOffline = async () => {
+        if (isRunning && timer.updatedAt) {
+          const newElapsedSecs: number = calculateElapsedTime(
+            Date.now(),
+            elapsedSecs,
+            timer.updatedAt,
           );
-          setTimeRemaining(
-            calculatedTimeRemaining < 0 ? 0 : calculatedTimeRemaining,
-          );
-          if (calculatedTimeRemaining <= 0) {
-            setIsRunning(false);
-            await updateTimer(timer.id, {
-              elapsed: timer.duration,
-              isRunning: false,
-              updatedAt: Date.now(),
-            });
-            return;
+          if (timer.type === "countdown" && timer.duration) {
+            const calculatedTimeRemaining = timer.duration - newElapsedSecs;
+            setElapsedSecs(
+              calculatedTimeRemaining < 0 ? timer.duration : newElapsedSecs,
+            );
+            setTimeRemaining(
+              calculatedTimeRemaining < 0 ? 0 : calculatedTimeRemaining,
+            );
+            if (calculatedTimeRemaining <= 0) {
+              setIsRunning(false);
+              await updateTimer(timer.id, {
+                elapsed: timer.duration,
+                isRunning: false,
+                updatedAt: Date.now(),
+              });
+              return;
+            }
+          } else {
+            setElapsedSecs(newElapsedSecs);
           }
-        } else {
-          setElapsedSecs(newElapsedSecs);
+          await updateTimer(timer.id, {
+            elapsed: newElapsedSecs,
+            updatedAt: Date.now(),
+          });
         }
-        await updateTimer(timer.id, {
-          elapsed: newElapsedSecs,
-          updatedAt: Date.now(),
-        });
-      }
-    };
-    void calculateAndSetTimeElapsedWhileOffline();
+      };
+
+      void calculateAndSetTimeElapsedWhileOffline();
+    }
   }, [document.visibilityState]);
 
   useEffect(() => {
