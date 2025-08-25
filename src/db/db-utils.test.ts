@@ -113,10 +113,7 @@ describe("Timer Dexie IndexedDb utility functions", () => {
     const newTimer: NewTimer = {
       name: "Morning Walk",
       duration: 30,
-      isRunning: false,
       type: "countdown",
-      elapsed: 0,
-      endTime: undefined,
     };
 
     const id = await addTimerToLocalDb(newTimer);
@@ -126,34 +123,26 @@ describe("Timer Dexie IndexedDb utility functions", () => {
   it("updates a timer in the db", async () => {
     const newTimer: NewTimer = {
       name: "Left Alone",
-      duration: 10,
-      isRunning: false,
       type: "stopwatch",
-      elapsed: 0,
-      endTime: undefined,
     };
 
     const updates = {
-      duration: 50,
+      name: "Time Left Alone",
     };
 
     const id = await addTimerToLocalDb(newTimer);
     let timer = await db.timers.get(id);
-    expect(timer?.duration).toBe(10);
+    expect(timer?.name).toBe("Left Alone");
     const result = await updateTimerInLocalDb(id, updates);
     timer = await db.timers.get(id);
     expect(result).toBe(1);
-    expect(timer?.duration).toBe(50);
+    expect(timer?.name).toBe("Time Left Alone");
   });
 
   it("deletes a timer from the db", async () => {
     const newTimer: NewTimer = {
       name: "Last Toilet Break",
-      duration: 30,
-      isRunning: false,
       type: "stopwatch",
-      elapsed: 0,
-      endTime: undefined,
     };
 
     const id = await addTimerToLocalDb(newTimer);
@@ -167,29 +156,18 @@ describe("Timer Dexie IndexedDb utility functions", () => {
   it("fetches all timers from the db", async () => {
     const timer1: NewTimer = {
       name: "Left Alone",
-      duration: 10,
-      isRunning: false,
       type: "stopwatch",
-      elapsed: 0,
-      endTime: undefined,
     };
 
     const timer2: NewTimer = {
       name: "Morning Walk",
       duration: 30,
-      isRunning: false,
       type: "countdown",
-      elapsed: 0,
-      endTime: undefined,
     };
 
     const timer3: NewTimer = {
       name: "Last Toilet Break",
-      duration: 30,
-      isRunning: false,
       type: "stopwatch",
-      elapsed: 0,
-      endTime: undefined,
     };
 
     await addTimerToLocalDb(timer1);
