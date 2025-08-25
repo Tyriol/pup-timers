@@ -1,5 +1,6 @@
 import React, { useState, useContext } from "react";
 import { TimersContext } from "../../context/Context";
+import type { NewTimer } from "../../types/types";
 
 interface TimerFormProps {
   setIsAddingTimer: React.Dispatch<React.SetStateAction<boolean>>;
@@ -11,17 +12,27 @@ const TimerForm = ({ setIsAddingTimer }: TimerFormProps) => {
 
   const handleAddTimer = async (formData: FormData) => {
     try {
-      const name = formData.get("timerName");
-      const type = formData.get("timerType");
+      const nameEntry = formData.get("timerName");
+      const typeEntry = formData.get("timerType");
+      const durationEntry = formData.get("duration");
 
       if (
-        typeof name !== "string" ||
-        (type !== "stopwatch" && type !== "countdown")
+        typeof nameEntry !== "string" ||
+        (typeEntry !== "stopwatch" && typeEntry !== "countdown") ||
+        (typeEntry === "countdown" && !durationEntry)
       ) {
         throw new Error("Invalid form data");
       }
 
-      await addTimer({ name, type });
+      const timerToAdd: NewTimer = {
+        name: nameEntry,
+        type: typeEntry,
+        ...(typeEntry === "countdown" && durationEntry
+          ? { duration: Number(durationEntry) }
+          : {}),
+      };
+
+      await addTimer(timerToAdd);
     } catch (error) {
       console.error(error);
     } finally {
@@ -59,7 +70,7 @@ const TimerForm = ({ setIsAddingTimer }: TimerFormProps) => {
           <input name="duration" type="number" />
         </label>
       ) : null}
-      <button>Close Form</button>
+      <button type="submit">Close Form</button>
     </form>
   );
 };
