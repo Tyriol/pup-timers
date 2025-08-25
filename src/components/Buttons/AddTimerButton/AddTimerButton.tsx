@@ -1,30 +1,13 @@
-import { useContext } from "react";
-import type { NewTimer } from "../../../types/types";
-import { TimersContext } from "../../../context/Context";
+import React from "react";
 
-const AddTimerButton = () => {
-  const { addTimer } = useContext(TimersContext);
+interface AddTimerButtonProps {
+  setIsAddingTimer: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-  const newTimer: NewTimer = {
-    type: "stopwatch",
-    elapsed: 0,
-    isRunning: false,
-    endTime: undefined,
-    name: "Next wee",
-    duration: 300,
-  };
-
-  const handleAddTimer = async () => {
-    try {
-      await addTimer(newTimer);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
+const AddTimerButton = ({ setIsAddingTimer }: AddTimerButtonProps) => {
   return (
     <button
-      onClick={() => void handleAddTimer()}
+      onClick={() => setIsAddingTimer(true)}
       className="bg-yellow-700 w-full max-w-md"
     >
       +
