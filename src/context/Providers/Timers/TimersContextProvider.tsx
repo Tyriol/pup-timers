@@ -34,7 +34,13 @@ export const TimersProvider = ({ children }: TimersProviderProps) => {
 
   const addTimer = async (newTimer: NewTimer) => {
     // temporary id for optimistic update
-    const tempTimer = { id: Date.now(), ...newTimer };
+    const tempTimer = {
+      id: Date.now(),
+      updatedAt: Date.now(),
+      isRunning: false,
+      elapsed: 0,
+      ...newTimer,
+    };
     setTimersList((prevTimers) => [...prevTimers, tempTimer]);
     try {
       const newTimerId = await addTimerToLocalDb(newTimer);
