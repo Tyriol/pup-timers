@@ -32,7 +32,12 @@ export const getAllTimersFromLocalDb = async () => {
 };
 
 export const addTimerToLocalDb = async (newTimer: NewTimer) => {
-  const id = await db.timers.add(newTimer);
+  const id = await db.timers.add({
+    ...newTimer,
+    updatedAt: Date.now(),
+    isRunning: false,
+    elapsed: 0,
+  });
   return id;
 };
 
@@ -54,8 +59,7 @@ export const deleteTimerFromLocalDb = async (id: number) => {
   }
 };
 
-// clear table
-// TODO: delete as I only want to use this while I'm working on getting the tables working
+// clear dogs table
 export const clearDogsTable = async () => {
   await db.dogs.clear();
 };
