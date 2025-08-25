@@ -42,9 +42,6 @@ describe("Timers Context", () => {
 
       const newTimer: NewTimer = {
         type: "countdown",
-        elapsed: 0,
-        isRunning: false,
-        endTime: undefined,
         name: "Morning Walk",
         duration: 30,
       };
@@ -89,9 +86,6 @@ describe("Timers Context", () => {
 
       const newTimer: NewTimer = {
         type: "countdown",
-        elapsed: 0,
-        isRunning: false,
-        endTime: undefined,
         name: "Morning Walk",
         duration: 30,
       };
@@ -161,9 +155,6 @@ describe("Timers Context", () => {
 
       const newTimer: NewTimer = {
         type: "countdown",
-        elapsed: 0,
-        isRunning: false,
-        endTime: undefined,
         name: "Morning Walk",
         duration: 30,
       };
