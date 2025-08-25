@@ -10,7 +10,10 @@ export interface Timer {
   endTime?: number;
 }
 
-export type NewTimer = Omit<Timer, "id" | "startTime">;
+export type NewTimer = Omit<
+  Timer,
+  "id" | "startTime" | "isRunning" | "elapsed" | "endTime"
+>;
 
 export interface Dog {
   id: number;
