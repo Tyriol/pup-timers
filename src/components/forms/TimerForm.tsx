@@ -41,37 +41,40 @@ const TimerForm = ({ setIsAddingTimer }: TimerFormProps) => {
   };
 
   return (
-    <form className="flex flex-col" action={handleAddTimer}>
-      <label>
-        Timer Name:
-        <input name="timerName" type="text" />
-      </label>
-      <label>
-        StopWatch
-        <input
-          onClick={() => setTimerType("stopwatch")}
-          type="radio"
-          name="timerType"
-          value="stopwatch"
-        />
-      </label>
-      <label>
-        Countdown
-        <input
-          onClick={() => setTimerType("countdown")}
-          type="radio"
-          name="timerType"
-          value="countdown"
-        />
-      </label>
-      {timerType === "countdown" ? (
+    <>
+      <form className="flex flex-col" action={handleAddTimer}>
         <label>
-          Duration:
-          <input name="duration" type="number" />
+          Timer Name:
+          <input name="timerName" type="text" />
         </label>
-      ) : null}
-      <button type="submit">Close Form</button>
-    </form>
+        <label>
+          Stopwatch
+          <input
+            onClick={() => setTimerType("stopwatch")}
+            type="radio"
+            name="timerType"
+            value="stopwatch"
+          />
+        </label>
+        <label>
+          Countdown
+          <input
+            onClick={() => setTimerType("countdown")}
+            type="radio"
+            name="timerType"
+            value="countdown"
+          />
+        </label>
+        {timerType === "countdown" ? (
+          <label>
+            Duration:
+            <input name="duration" type="number" />
+          </label>
+        ) : null}
+        <button type="submit">Add</button>
+      </form>
+      <button onClick={() => setIsAddingTimer(false)}>X</button>
+    </>
   );
 };
 
