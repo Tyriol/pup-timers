@@ -1,0 +1,86 @@
+import { describe, it, vi, expect } from "vitest";
+import { render, screen, fireEvent, act } from "@testing-library/react";
+import { createContext } from "react";
+import TimerForm from "./TimerForm";
+
+vi.mock("../../context/Context", () => ({
+  TimersContext: createContext({ addTimer: vi.fn() }),
+}));
+
+const renderWithProp = (
+  setIsAddingTimer: React.Dispatch<React.SetStateAction<boolean>>,
+) => {
+  render(<TimerForm setIsAddingTimer={setIsAddingTimer} />);
+};
+
+describe("Timer Form Rendering", () => {
+  it("Renders the form with inputs for Timer name and type, a close button and an add button", () => {
+    const setIsAddingTimer = vi.fn();
+    renderWithProp(setIsAddingTimer);
+
+    expect(
+      screen.getByRole("textbox", { name: "Timer Name:" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("radio", { name: "Stopwatch" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("radio", { name: "Countdown" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "X" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Add" })).toBeInTheDocument();
+  });
+
+  it("doesn't render the duration field if Stopwatch is selected", () => {
+    const setIsAddingTimer = vi.fn();
+    renderWithProp(setIsAddingTimer);
+    const stopwatchRadioBtn = screen.getByRole("radio", { name: "Stopwatch" });
+    fireEvent.click(stopwatchRadioBtn);
+    expect(
+      screen.queryByRole("spinbutton", { name: "Duration:" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("does render the duration field if Countdown is selected", () => {
+    const setIsAddingTimer = vi.fn();
+    renderWithProp(setIsAddingTimer);
+    const countdownRadioBtn = screen.getByRole("radio", { name: "Countdown" });
+    fireEvent.click(countdownRadioBtn);
+    expect(
+      screen.queryByRole("spinbutton", { name: "Duration:" }),
+    ).toBeInTheDocument();
+  });
+});
+
+// describe("Timer form logic", () => {
+//   it("calls setIsAddingTimer(false) when the close button is clicked", () => {
+//     const setIsAddingTimer = vi.fn();
+//     renderWithProp(setIsAddingTimer);
+//     const closeBtn = screen.getByText("X");
+
+//     fireEvent.click(closeBtn);
+
+//     expect(setIsAddingTimer).toHaveBeenCalledWith(false);
+//   });
+
+//   it("submits the form with valid data", async () => {
+//     const addTimer = vi.fn();
+//     const setIsAddingTimer = vi.fn();
+//     renderWithProp(setIsAddingTimer);
+
+//     const nameField = screen.getByRole("textbox", { name: "Timer Name:" });
+//     const stopwatchRadioBtn = screen.getByRole("radio", { name: "Stopwatch" });
+//     const addBtn = screen.getByRole("button", { name: "Add" });
+
+//     fireEvent.change(nameField, { target: { value: "Test Timer" } });
+//     fireEvent.click(stopwatchRadioBtn);
+//     await act(async () => {
+//       fireEvent.click(addBtn);
+//     });
+
+//     expect(addTimer).toHaveBeenCalledWith({
+//       name: "My Timer",
+//       type: "stopwatch",
+//     });
+//   });
+// });
