@@ -1,5 +1,5 @@
 import { describe, it, vi, expect } from "vitest";
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { createContext } from "react";
 import TimerForm from "./TimerForm";
 
@@ -52,35 +52,14 @@ describe("Timer Form Rendering", () => {
   });
 });
 
-// describe("Timer form logic", () => {
-//   it("calls setIsAddingTimer(false) when the close button is clicked", () => {
-//     const setIsAddingTimer = vi.fn();
-//     renderWithProp(setIsAddingTimer);
-//     const closeBtn = screen.getByText("X");
+describe("Timer form logic", () => {
+  it("calls setIsAddingTimer(false) when the close button is clicked", () => {
+    const setIsAddingTimer = vi.fn();
+    renderWithProp(setIsAddingTimer);
+    const closeBtn = screen.getByText("X");
 
-//     fireEvent.click(closeBtn);
+    fireEvent.click(closeBtn);
 
-//     expect(setIsAddingTimer).toHaveBeenCalledWith(false);
-//   });
-
-//   it("submits the form with valid data", async () => {
-//     const addTimer = vi.fn();
-//     const setIsAddingTimer = vi.fn();
-//     renderWithProp(setIsAddingTimer);
-
-//     const nameField = screen.getByRole("textbox", { name: "Timer Name:" });
-//     const stopwatchRadioBtn = screen.getByRole("radio", { name: "Stopwatch" });
-//     const addBtn = screen.getByRole("button", { name: "Add" });
-
-//     fireEvent.change(nameField, { target: { value: "Test Timer" } });
-//     fireEvent.click(stopwatchRadioBtn);
-//     await act(async () => {
-//       fireEvent.click(addBtn);
-//     });
-
-//     expect(addTimer).toHaveBeenCalledWith({
-//       name: "My Timer",
-//       type: "stopwatch",
-//     });
-//   });
-// });
+    expect(setIsAddingTimer).toHaveBeenCalledWith(false);
+  });
+});
