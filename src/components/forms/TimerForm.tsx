@@ -58,20 +58,22 @@ const TimerForm = ({ setIsAddingTimer }: TimerFormProps) => {
           <label className="flex gap-2">
             Stopwatch
             <input
-              onClick={() => setTimerType("stopwatch")}
+              onChange={() => setTimerType("stopwatch")}
               type="radio"
               name="timerType"
               value="stopwatch"
+              checked={timerType === "stopwatch"}
             />
           </label>
 
           <label className="flex gap-2">
             Countdown
             <input
-              onClick={() => setTimerType("countdown")}
+              onChange={() => setTimerType("countdown")}
               type="radio"
               name="timerType"
               value="countdown"
+              checked={timerType === "countdown"}
             />
           </label>
         </div>
