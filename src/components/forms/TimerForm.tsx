@@ -42,38 +42,59 @@ const TimerForm = ({ setIsAddingTimer }: TimerFormProps) => {
 
   return (
     <>
-      <form className="flex flex-col" action={handleAddTimer}>
-        <label>
+      <form
+        className="flex flex-col items-center gap-6 w-full"
+        action={handleAddTimer}
+      >
+        <label className="flex flex-col w-full gap-2">
           Timer Name:
-          <input name="timerName" type="text" />
-        </label>
-        <label>
-          Stopwatch
           <input
-            onClick={() => setTimerType("stopwatch")}
-            type="radio"
-            name="timerType"
-            value="stopwatch"
+            className="bg-gray-600 rounded-sm leading-10 px-2"
+            name="timerName"
+            type="text"
           />
         </label>
-        <label>
-          Countdown
-          <input
-            onClick={() => setTimerType("countdown")}
-            type="radio"
-            name="timerType"
-            value="countdown"
-          />
-        </label>
+        <div className="flex gap-4">
+          <label className="flex gap-2">
+            Stopwatch
+            <input
+              onClick={() => setTimerType("stopwatch")}
+              type="radio"
+              name="timerType"
+              value="stopwatch"
+            />
+          </label>
+
+          <label className="flex gap-2">
+            Countdown
+            <input
+              onClick={() => setTimerType("countdown")}
+              type="radio"
+              name="timerType"
+              value="countdown"
+            />
+          </label>
+        </div>
         {timerType === "countdown" ? (
-          <label>
+          <label className="flex flex-col w-full gap-2">
             Duration:
-            <input name="duration" type="number" />
+            <input
+              className="bg-gray-600 rounded-sm leading-10 px-2"
+              name="duration"
+              type="number"
+            />
           </label>
         ) : null}
-        <button type="submit">Add</button>
+        <button className="w-full bg-yellow-700 rounded-md" type="submit">
+          Add
+        </button>
       </form>
-      <button onClick={() => setIsAddingTimer(false)}>X</button>
+      <button
+        className="w-full bg-yellow-700 rounded-md mt-2"
+        onClick={() => setIsAddingTimer(false)}
+      >
+        Cancel
+      </button>
     </>
   );
 };
