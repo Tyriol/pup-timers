@@ -45,7 +45,7 @@ describe("Timer Form Rendering", () => {
     expect(
       screen.getByRole("radio", { name: "Countdown" }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "X" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Cancel" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Add" })).toBeInTheDocument();
   });
 
@@ -75,7 +75,7 @@ describe("Timer form logic", () => {
     const setIsAddingTimer = vi.fn();
 
     renderWithProp(setIsAddingTimer);
-    const closeBtn = screen.getByText("X");
+    const closeBtn = screen.getByText("Cancel");
 
     fireEvent.click(closeBtn);
 
