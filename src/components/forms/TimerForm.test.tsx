@@ -90,15 +90,41 @@ describe("Timer form logic", () => {
     const stopwatchRadioBtn = screen.getByRole("radio", { name: "Stopwatch" });
     const addBtn = screen.getByRole("button", { name: "Add" });
 
-    fireEvent.change(nameField, { target: { value: "Test Timer" } });
+    fireEvent.change(nameField, { target: { value: "Test S Timer" } });
     fireEvent.click(stopwatchRadioBtn);
     await act(async () => {
       fireEvent.click(addBtn);
     });
 
     expect(mockAddTimer).toHaveBeenCalledWith({
-      name: "Test Timer",
+      name: "Test S Timer",
       type: "stopwatch",
+    });
+  });
+
+  it("submits the form with valid data for a countdown", async () => {
+    const setIsAddingTimer = vi.fn();
+    renderWithProp(setIsAddingTimer);
+
+    const nameField = screen.getByRole("textbox", { name: "Timer Name:" });
+    const countdownRadioBtn = screen.getByRole("radio", { name: "Countdown" });
+    const addBtn = screen.getByRole("button", { name: "Add" });
+
+    fireEvent.change(nameField, { target: { value: "Test C Timer" } });
+    fireEvent.click(countdownRadioBtn);
+
+    const durationField = screen.getByRole("spinbutton", { name: "Duration:" });
+
+    fireEvent.change(durationField, { target: { value: 300 } });
+
+    await act(async () => {
+      fireEvent.click(addBtn);
+    });
+
+    expect(mockAddTimer).toHaveBeenCalledWith({
+      name: "Test C Timer",
+      type: "countdown",
+      duration: 300,
     });
   });
 });
