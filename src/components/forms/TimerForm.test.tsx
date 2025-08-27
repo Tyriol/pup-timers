@@ -26,7 +26,7 @@ const renderWithProp = (
 ) => {
   render(
     <TimersProviderMock>
-      <TimerForm setIsAddingTimer={setIsAddingTimer} />;
+      <TimerForm setIsAddingTimer={setIsAddingTimer} />
     </TimersProviderMock>,
   );
 };
