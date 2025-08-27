@@ -1,16 +1,34 @@
 import { describe, it, vi, expect } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
-import { createContext } from "react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
+import { TimersContext } from "../../context/Context";
 import TimerForm from "./TimerForm";
 
-vi.mock("../../context/Context", () => ({
-  TimersContext: createContext({ addTimer: vi.fn() }),
-}));
+const mockAddTimer = vi.fn(() => Promise.resolve(1));
+
+const TimersProviderMock: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => (
+  <TimersContext.Provider
+    value={{
+      timersList: [],
+      loading: true,
+      addTimer: mockAddTimer,
+      updateTimer: vi.fn(),
+      deleteTimer: vi.fn(),
+    }}
+  >
+    {children}
+  </TimersContext.Provider>
+);
 
 const renderWithProp = (
   setIsAddingTimer: React.Dispatch<React.SetStateAction<boolean>>,
 ) => {
-  render(<TimerForm setIsAddingTimer={setIsAddingTimer} />);
+  render(
+    <TimersProviderMock>
+      <TimerForm setIsAddingTimer={setIsAddingTimer} />;
+    </TimersProviderMock>,
+  );
 };
 
 describe("Timer Form Rendering", () => {
@@ -55,11 +73,32 @@ describe("Timer Form Rendering", () => {
 describe("Timer form logic", () => {
   it("calls setIsAddingTimer(false) when the close button is clicked", () => {
     const setIsAddingTimer = vi.fn();
+
     renderWithProp(setIsAddingTimer);
     const closeBtn = screen.getByText("X");
 
     fireEvent.click(closeBtn);
 
     expect(setIsAddingTimer).toHaveBeenCalledWith(false);
+  });
+
+  it("submits the form with valid data for a stopwatch", async () => {
+    const setIsAddingTimer = vi.fn();
+    renderWithProp(setIsAddingTimer);
+
+    const nameField = screen.getByRole("textbox", { name: "Timer Name:" });
+    const stopwatchRadioBtn = screen.getByRole("radio", { name: "Stopwatch" });
+    const addBtn = screen.getByRole("button", { name: "Add" });
+
+    fireEvent.change(nameField, { target: { value: "Test Timer" } });
+    fireEvent.click(stopwatchRadioBtn);
+    await act(async () => {
+      fireEvent.click(addBtn);
+    });
+
+    expect(mockAddTimer).toHaveBeenCalledWith({
+      name: "Test Timer",
+      type: "stopwatch",
+    });
   });
 });
