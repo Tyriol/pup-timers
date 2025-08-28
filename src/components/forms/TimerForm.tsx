@@ -18,6 +18,7 @@ const TimerForm = ({ setIsAddingTimer }: TimerFormProps) => {
 
       if (
         typeof nameEntry !== "string" ||
+        !nameEntry ||
         (typeEntry !== "stopwatch" && typeEntry !== "countdown") ||
         (typeEntry === "countdown" && !durationEntry)
       ) {
