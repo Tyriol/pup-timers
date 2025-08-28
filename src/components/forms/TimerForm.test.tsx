@@ -1,4 +1,4 @@
-import { describe, it, vi, expect } from "vitest";
+import { describe, it, vi, expect, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import { TimersContext } from "../../context/Context";
 import TimerForm from "./TimerForm";
@@ -126,5 +126,41 @@ describe("Timer form logic", () => {
       type: "countdown",
       duration: 300,
     });
+  });
+});
+
+describe("TimerForm error handling", () => {
+  let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    consoleErrorSpy.mockRestore();
+  });
+
+  it("consoles an error if no data is submitted", () => {
+    const setIsAddingTimer = vi.fn();
+    renderWithProp(setIsAddingTimer);
+
+    const addBtn = screen.getByRole("button", { name: "Add" });
+
+    fireEvent.click(addBtn);
+
+    expect(consoleErrorSpy).toHaveBeenCalled();
+  });
+
+  it("consoles an error if type is countdown and no duration is submitted", () => {
+    const setIsAddingTimer = vi.fn();
+    renderWithProp(setIsAddingTimer);
+
+    const addBtn = screen.getByRole("button", { name: "Add" });
+    const countdownRadioBtn = screen.getByRole("radio", { name: "Countdown" });
+
+    fireEvent.click(countdownRadioBtn);
+    fireEvent.click(addBtn);
+
+    expect(consoleErrorSpy).toHaveBeenCalled();
   });
 });
