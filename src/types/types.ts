@@ -25,7 +25,7 @@ export interface Dog {
 export type NewDog = Omit<Dog, "id">;
 
 export interface TimerFormData {
-  nameEntry: string;
-  typeEntry: "countdown" | "stopwatch";
-  durationEntry?: number;
+  nameEntry: string | null;
+  typeEntry: "countdown" | "stopwatch" | null;
+  durationEntry?: number | null;
 }
