@@ -144,6 +144,11 @@ const TimerDisplay = ({ timer }: TimerProps) => {
         <p className="time">{stateDays}</p>
         <p className="time">{stateTime}</p>
       </div>
+      <div className="flex justify-center timer-buttons">
+        {/* <button>▶️</button>
+        <button>⏹️</button>
+        <button>🔁</button> */}
+      </div>
     </button>
   );
 };
