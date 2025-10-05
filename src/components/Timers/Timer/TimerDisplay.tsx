@@ -17,6 +17,8 @@ const TimerDisplay = ({ timer }: TimerProps) => {
   const [stateTime, setStateTime] = useState<string>("");
   const [isRunning, setIsRunning] = useState<boolean>(timer.isRunning);
 
+  const timerButtonClass = "!p-0 h-[1rem]";
+
   const getShadowColourClass = (isRunning: boolean, elapsedSecs: number) => {
     if (isRunning) {
       return "shadow-green-500";
@@ -136,20 +138,26 @@ const TimerDisplay = ({ timer }: TimerProps) => {
   };
 
   return (
-    <button onClick={() => void toggleTimerOnOff()} className={timerCardClass}>
-      <h2 className="flex items-center justify-center h-[2em] leading-none">
+    <div className={timerCardClass}>
+      <h2 className="flex items-center justify-center h-[1.5em] leading-none">
         {timer.name}
       </h2>
-      <div className="text-center">
-        <p className="time">{stateDays}</p>
-        <p className="time">{stateTime}</p>
+      <div>
+        <div className="text-center">
+          <p className="time">{stateDays}</p>
+          <p className="time">{stateTime}</p>
+        </div>
+        <div className="flex justify-around">
+          <button
+            className={timerButtonClass}
+            onClick={() => void toggleTimerOnOff()}
+          >
+            {isRunning ? "⏸️" : "▶️"}
+          </button>
+          <button className={timerButtonClass}>🔁</button>
+        </div>
       </div>
-      <div className="flex justify-center timer-buttons">
-        {/* <button>▶️</button>
-        <button>⏹️</button>
-        <button>🔁</button> */}
-      </div>
-    </button>
+    </div>
   );
 };
 
