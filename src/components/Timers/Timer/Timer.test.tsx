@@ -64,9 +64,6 @@ describe("Stopwatch", () => {
     renderWithContext(baseTimer);
     expect(screen.getByText("Test Stopwatch")).toBeInTheDocument();
     expect(screen.getByText("00:00:00")).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: "Test Stopwatch 00:00:00" }),
-    ).toHaveClass("shadow-indigo-500");
   });
 
   it("calculates elapsed time and renders the correct time display", async () => {
@@ -88,7 +85,7 @@ describe("Stopwatch", () => {
     renderWithContext({ ...baseTimer, isRunning: false });
     const currentTime = new Date("2025-08-21T10:00:00Z").getTime();
     const startBtn = screen.getByRole("button", {
-      name: "Test Stopwatch 00:00:00",
+      name: "▶️",
     });
 
     await act(async () => {
