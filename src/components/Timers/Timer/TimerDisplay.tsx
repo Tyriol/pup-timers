@@ -2,9 +2,11 @@ import { useEffect, useState, useContext } from "react";
 import { formatTime, calculateElapsedTime } from "../../../lib/timers";
 import type { Timer } from "../../../types/types";
 import { TimersContext } from "../../../context/Context";
+// import TimerCardButton from "../../Buttons/TimerCardButton";
 
 interface TimerProps {
   timer: Timer;
+  setIsEditing?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const TimerDisplay = ({ timer }: TimerProps) => {
@@ -144,6 +146,8 @@ const TimerDisplay = ({ timer }: TimerProps) => {
         <p className="time">{stateDays}</p>
         <p className="time">{stateTime}</p>
       </div>
+      {/* TODO: Add this back in and figure out how to handle it in the tests */}
+      {/* <TimerCardButton setIsAddingTimer={setIsEditing} /> */}
     </button>
   );
 };
