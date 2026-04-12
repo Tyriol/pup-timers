@@ -1,7 +1,7 @@
 import "./App.css";
 import { useState } from "react";
 import TimersContainer from "./components/Timers/TimersContainer/TimersContainer";
-import AddTimerButton from "./components/Buttons/AddTimerButton/AddTimerButton";
+import AddTimerButton from "./components/Buttons/AddTimerButton";
 import TimerForm from "./components/forms/TimerForm";
 
 function App() {
