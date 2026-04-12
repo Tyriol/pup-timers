@@ -10,7 +10,7 @@
     "format": "prettier --write .",
     "preview": "vite preview",
     "prepare": "husky",
-    "test:unit": "vitest --root src/",
+    "test:unit": "vitest --root src/ --reporter=verbose",
     "test:e2e": "cypress run --browser chrome",
     "test:e2e:open": "cypress open",
     "test:coverage": "vitest run --coverage"
