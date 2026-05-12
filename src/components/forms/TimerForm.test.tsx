@@ -21,20 +21,18 @@ const TimersProviderMock: React.FC<{ children: React.ReactNode }> = ({
   </TimersContext.Provider>
 );
 
-const renderWithProp = (
-  setIsAddingTimer: React.Dispatch<React.SetStateAction<boolean>>,
-) => {
+const renderWithProp = (onCancel: () => void) => {
   render(
     <TimersProviderMock>
-      <TimerForm setIsAddingTimer={setIsAddingTimer} />
+      <TimerForm onCancel={onCancel} />
     </TimersProviderMock>,
   );
 };
 
 describe("Timer Form Rendering", () => {
   it("Renders the form with inputs for Timer name and type, a close button and an add button", () => {
-    const setIsAddingTimer = vi.fn();
-    renderWithProp(setIsAddingTimer);
+    const onCancel = vi.fn();
+    renderWithProp(onCancel);
 
     expect(
       screen.getByRole("textbox", { name: "Timer Name:" }),
@@ -71,20 +69,20 @@ describe("Timer Form Rendering", () => {
 });
 
 describe("Timer form logic", () => {
-  it("calls setIsAddingTimer(false) when the close button is clicked", () => {
-    const setIsAddingTimer = vi.fn();
+  it("calls onCancel() when the close button is clicked", () => {
+    const onCancel = vi.fn();
 
-    renderWithProp(setIsAddingTimer);
+    renderWithProp(onCancel);
     const closeBtn = screen.getByText("Cancel");
 
     fireEvent.click(closeBtn);
 
-    expect(setIsAddingTimer).toHaveBeenCalledWith(false);
+    expect(onCancel).toHaveBeenCalled();
   });
 
   it("submits the form with valid data for a stopwatch", async () => {
-    const setIsAddingTimer = vi.fn();
-    renderWithProp(setIsAddingTimer);
+    const onCancel = vi.fn();
+    renderWithProp(onCancel);
 
     const nameField = screen.getByRole("textbox", { name: "Timer Name:" });
     const stopwatchRadioBtn = screen.getByRole("radio", { name: "Stopwatch" });
@@ -103,8 +101,8 @@ describe("Timer form logic", () => {
   });
 
   it("submits the form with valid data for a countdown", async () => {
-    const setIsAddingTimer = vi.fn();
-    renderWithProp(setIsAddingTimer);
+    const onCancel = vi.fn();
+    renderWithProp(onCancel);
 
     const nameField = screen.getByRole("textbox", { name: "Timer Name:" });
     const countdownRadioBtn = screen.getByRole("radio", { name: "Countdown" });
@@ -141,8 +139,8 @@ describe("TimerForm error handling", () => {
   });
 
   it("consoles an error if no data is submitted", () => {
-    const setIsAddingTimer = vi.fn();
-    renderWithProp(setIsAddingTimer);
+    const onCancel = vi.fn();
+    renderWithProp(onCancel);
 
     const addBtn = screen.getByRole("button", { name: "Add" });
 
