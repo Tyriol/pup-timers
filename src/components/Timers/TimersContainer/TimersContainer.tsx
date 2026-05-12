@@ -5,20 +5,28 @@ import TimerForm from "../../forms/TimerForm";
 
 const TimersContainer = () => {
   const { timersList, loading } = useContext(TimersContext);
-  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [selectedTimerId, setSelectedTimerId] = useState<number | null>(null);
+
+  const handleEditTimer = (timerId: number) => {
+    setSelectedTimerId(timerId);
+  };
 
   if (loading) {
     return <p>Loading...</p>;
   }
 
   const displayedTimers = timersList.map((timer) => (
-    <TimerDisplay setIsEditing={setIsEditing} key={timer.id} timer={timer} />
+    <TimerDisplay onEdit={handleEditTimer} key={timer.id} timer={timer} />
   ));
 
   return timersList.length === 0 ? (
     <h2>Add a timer to see them here</h2>
-  ) : isEditing ? (
-    <TimerForm setIsAddingTimer={setIsEditing} />
+  ) : selectedTimerId !== null ? (
+    <TimerForm
+      editingTimerId={selectedTimerId}
+      timers={timersList}
+      onCancel={() => setSelectedTimerId(null)}
+    />
   ) : (
     <div className="grid grid-cols-2 gap-4 py-8 px-1 w-80 overflow-y-auto scroll-smooth">
       {displayedTimers}

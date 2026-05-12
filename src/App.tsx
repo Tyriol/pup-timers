@@ -9,7 +9,7 @@ function App() {
   return (
     <div className="grid items-center justify-center w-full max-h-screen">
       {isAddingTimer ? (
-        <TimerForm setIsAddingTimer={setIsAddingTimer} />
+        <TimerForm onCancel={() => setIsAddingTimer(false)} />
       ) : (
         <>
           <TimersContainer />

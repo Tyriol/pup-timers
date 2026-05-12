@@ -1,43 +1,71 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { TimersContext } from "../../context/Context";
-import type { NewTimer } from "../../types/types";
+import type { Timer, NewTimer } from "../../types/types";
 
 interface TimerFormProps {
-  setIsAddingTimer: React.Dispatch<React.SetStateAction<boolean>>;
+  editingTimerId?: number;
+  timers?: Timer[];
+  onCancel: () => void;
 }
 
-const TimerForm = ({ setIsAddingTimer }: TimerFormProps) => {
+const TimerForm = ({ editingTimerId, timers, onCancel }: TimerFormProps) => {
   const [timerType, setTimerType] = useState("stopwatch");
-  const { addTimer } = useContext(TimersContext);
+  const [timerName, setTimerName] = useState("");
+  const [timerDuration, setTimerDuration] = useState("");
 
-  const handleAddTimer = async (formData: FormData) => {
+  const { addTimer, updateTimer } = useContext(TimersContext);
+
+  const timerToEdit = editingTimerId
+    ? timers?.find((t) => t.id === editingTimerId)
+    : null;
+
+  useEffect(() => {
+    if (timerToEdit) {
+      setTimerName(timerToEdit.name);
+      setTimerType(timerToEdit.type);
+      setTimerDuration(timerToEdit.duration?.toString() ?? "");
+    } else {
+      setTimerName("");
+      setTimerType("stopwatch");
+      setTimerDuration("");
+    }
+  }, [timerToEdit]);
+
+  const handleSubmitTimer = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
-      const nameEntry = formData.get("timerName");
-      const typeEntry = formData.get("timerType");
-      const durationEntry = formData.get("duration");
-
       if (
-        typeof nameEntry !== "string" ||
-        !nameEntry ||
-        (typeEntry !== "stopwatch" && typeEntry !== "countdown") ||
-        (typeEntry === "countdown" && !durationEntry)
+        typeof timerName !== "string" ||
+        !timerName ||
+        (timerType !== "stopwatch" && timerType !== "countdown") ||
+        (timerType === "countdown" && !timerDuration)
       ) {
         throw new Error("Invalid form data");
       }
 
-      const timerToAdd: NewTimer = {
-        name: nameEntry,
-        type: typeEntry,
-        ...(typeEntry === "countdown" && durationEntry
-          ? { duration: Number(durationEntry) }
-          : {}),
-      };
+      if (timerToEdit) {
+        await updateTimer(timerToEdit.id, {
+          name: timerName,
+          type: timerType,
+          ...(timerType === "countdown" && timerDuration
+            ? { duration: Number(timerDuration) }
+            : {}),
+          updatedAt: Date.now(),
+        });
+      } else {
+        const timerToAdd: NewTimer = {
+          name: timerName,
+          type: timerType,
+          ...(timerType === "countdown" && timerDuration
+            ? { duration: Number(timerDuration) }
+            : {}),
+        };
 
-      await addTimer(timerToAdd);
+        await addTimer(timerToAdd);
+      }
+      onCancel();
     } catch (error) {
       console.error(error);
-    } finally {
-      setIsAddingTimer(false);
     }
   };
 
@@ -45,7 +73,7 @@ const TimerForm = ({ setIsAddingTimer }: TimerFormProps) => {
     <>
       <form
         className="flex flex-col items-center gap-6 w-full"
-        action={handleAddTimer}
+        onSubmit={(e) => void handleSubmitTimer(e)}
       >
         <label className="flex flex-col w-full gap-2">
           Timer Name:
@@ -53,6 +81,8 @@ const TimerForm = ({ setIsAddingTimer }: TimerFormProps) => {
             className="bg-gray-600 rounded-sm leading-10 px-2"
             name="timerName"
             type="text"
+            value={timerName}
+            onChange={(e) => setTimerName(e.target.value)}
           />
         </label>
         <div className="flex gap-4">
@@ -85,6 +115,8 @@ const TimerForm = ({ setIsAddingTimer }: TimerFormProps) => {
               className="bg-gray-600 rounded-sm leading-10 px-2"
               name="duration"
               type="number"
+              value={timerDuration}
+              onChange={(e) => setTimerDuration(e.target.value)}
             />
           </label>
         ) : null}
@@ -94,7 +126,7 @@ const TimerForm = ({ setIsAddingTimer }: TimerFormProps) => {
       </form>
       <button
         className="w-full bg-yellow-700 rounded-md mt-2"
-        onClick={() => setIsAddingTimer(false)}
+        onClick={onCancel}
       >
         Cancel
       </button>
