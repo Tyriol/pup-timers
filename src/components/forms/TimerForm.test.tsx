@@ -1,9 +1,11 @@
-import { describe, it, vi, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, vi, expect } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import { TimersContext } from "../../context/Context";
 import TimerForm from "./TimerForm";
+import type { Timer } from "../../types/types";
 
 const mockAddTimer = vi.fn(() => Promise.resolve(1));
+const mockUpdateTimer = vi.fn(() => Promise.resolve());
 
 const TimersProviderMock: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -13,7 +15,7 @@ const TimersProviderMock: React.FC<{ children: React.ReactNode }> = ({
       timersList: [],
       loading: true,
       addTimer: mockAddTimer,
-      updateTimer: vi.fn(),
+      updateTimer: mockUpdateTimer,
       deleteTimer: vi.fn(),
     }}
   >
@@ -125,31 +127,66 @@ describe("Timer form logic", () => {
       duration: 300,
     });
   });
+
+  it("prefills a timer and updates it instead of adding a new timer", async () => {
+    const onCancel = vi.fn();
+    const timer: Timer = {
+      id: 7,
+      name: "Breakfast",
+      type: "stopwatch",
+      elapsed: 0,
+      isRunning: false,
+    };
+
+    render(
+      <TimersProviderMock>
+        <TimerForm
+          editingTimerId={timer.id}
+          timers={[timer]}
+          onCancel={onCancel}
+        />
+      </TimersProviderMock>,
+    );
+
+    const nameField = screen.getByRole("textbox", { name: "Timer Name:" });
+    expect(nameField).toHaveValue("Breakfast");
+    expect(screen.getByRole("button", { name: "Update" })).toBeInTheDocument();
+
+    fireEvent.change(nameField, { target: { value: "Evening walk" } });
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Update" }));
+    });
+
+    expect(mockUpdateTimer).toHaveBeenCalledWith(
+      7,
+      expect.objectContaining({
+        name: "Evening walk",
+        type: "stopwatch",
+        duration: undefined,
+        updatedAt: expect.any(Number),
+      }),
+    );
+    expect(onCancel).toHaveBeenCalled();
+  });
 });
 
 describe("TimerForm error handling", () => {
-  let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
-
-  beforeEach(() => {
-    consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-  });
-
-  afterEach(() => {
-    consoleErrorSpy.mockRestore();
-  });
-
-  it("consoles an error if no data is submitted", () => {
+  it("shows an error if no name is submitted", () => {
     const onCancel = vi.fn();
     renderWithProp(onCancel);
 
     const addBtn = screen.getByRole("button", { name: "Add" });
 
-    fireEvent.click(addBtn);
+    const form = addBtn.closest("form");
+    if (!form) {
+      throw new Error("Timer form was not rendered");
+    }
+    fireEvent.submit(form);
 
-    expect(consoleErrorSpy).toHaveBeenCalled();
+    expect(screen.getByRole("alert")).toHaveTextContent("Enter a timer name.");
   });
 
-  it("consoles an error if type is countdown and no duration is submitted", () => {
+  it("shows an error if a countdown duration is not positive whole seconds", () => {
     const setIsAddingTimer = vi.fn();
     renderWithProp(setIsAddingTimer);
 
@@ -157,8 +194,21 @@ describe("TimerForm error handling", () => {
     const countdownRadioBtn = screen.getByRole("radio", { name: "Countdown" });
 
     fireEvent.click(countdownRadioBtn);
-    fireEvent.click(addBtn);
+    fireEvent.change(screen.getByRole("textbox", { name: "Timer Name:" }), {
+      target: { value: "Medication" },
+    });
+    fireEvent.change(screen.getByRole("spinbutton", { name: "Duration:" }), {
+      target: { value: "0" },
+    });
 
-    expect(consoleErrorSpy).toHaveBeenCalled();
+    const form = addBtn.closest("form");
+    if (!form) {
+      throw new Error("Timer form was not rendered");
+    }
+    fireEvent.submit(form);
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Enter a whole-number duration greater than zero.",
+    );
   });
 });

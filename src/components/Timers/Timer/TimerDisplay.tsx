@@ -2,14 +2,14 @@ import { useEffect, useState, useContext } from "react";
 import { formatTime, calculateElapsedTime } from "../../../lib/timers";
 import type { Timer } from "../../../types/types";
 import { TimersContext } from "../../../context/Context";
-// import TimerCardButton from "../../Buttons/TimerCardButton";
+import TimerCardButton from "../../Buttons/TimerCardButton";
 
 interface TimerProps {
   timer: Timer;
-  setIsEditing?: React.Dispatch<React.SetStateAction<boolean>>;
+  onEdit: (timerId: number) => void;
 }
 
-const TimerDisplay = ({ timer }: TimerProps) => {
+const TimerDisplay = ({ timer, onEdit }: TimerProps) => {
   const { updateTimer } = useContext(TimersContext);
   const [timeRemaining, setTimeRemaining] = useState<number>(
     (timer.duration ?? 0) - timer.elapsed,
@@ -29,7 +29,7 @@ const TimerDisplay = ({ timer }: TimerProps) => {
     }
   };
 
-  const timerCardClass = `flex flex-col items-center justify-center gap-5 p-5 shadow-md ${getShadowColourClass(isRunning, elapsedSecs)} rounded-md bg-neutral-700/50`;
+  const timerCardClass = `grid grid-cols-2 items-center justify-center gap-5 p-5 shadow-md ${getShadowColourClass(isRunning, elapsedSecs)} rounded-md bg-neutral-700/50`;
 
   useEffect(() => {
     if (document.visibilityState === "visible") {
@@ -138,17 +138,28 @@ const TimerDisplay = ({ timer }: TimerProps) => {
   };
 
   return (
-    <button onClick={() => void toggleTimerOnOff()} className={timerCardClass}>
-      <h2 className="flex items-center justify-center h-[2em] leading-none">
-        {timer.name}
-      </h2>
-      <div className="text-center">
-        <p className="time">{stateDays}</p>
-        <p className="time">{stateTime}</p>
+    <div className={timerCardClass}>
+      <div>
+        <h2 className="flex items-center justify-center h-[2em] leading-none">
+          {timer.name}
+        </h2>
+        <div className="text-center">
+          <p className="time">{stateDays}</p>
+          <p className="time">{stateTime}</p>
+        </div>
       </div>
-      {/* TODO: Add this back in and figure out how to handle it in the tests */}
-      {/* <TimerCardButton setIsAddingTimer={setIsEditing} /> */}
-    </button>
+      <div>
+        <TimerCardButton
+          type="playPause"
+          onClick={() => void toggleTimerOnOff()}
+        />
+        <TimerCardButton
+          type="edit"
+          onClick={() => onEdit(timer.id)}
+          disabled={isRunning}
+        />
+      </div>
+    </div>
   );
 };
 

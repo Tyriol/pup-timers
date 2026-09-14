@@ -28,7 +28,7 @@ const TimersContainer = () => {
       onCancel={() => setSelectedTimerId(null)}
     />
   ) : (
-    <div className="grid grid-cols-2 gap-4 py-8 px-1 w-80 overflow-y-auto scroll-smooth">
+    <div className="grid grid-cols-1 gap-4 py-8 px-1 w-80 overflow-y-auto scroll-smooth">
       {displayedTimers}
     </div>
   );

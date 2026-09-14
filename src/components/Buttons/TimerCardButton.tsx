@@ -1,18 +1,40 @@
 import React from "react";
 
 interface TimerCardButtonProps {
-  setIsAddingTimer: React.Dispatch<React.SetStateAction<boolean>>;
+  type: "playPause" | "reset" | "edit";
+  onClick: () => void;
+  disabled?: boolean;
 }
 
-const TimerCardButton = ({ setIsAddingTimer }: TimerCardButtonProps) => {
+const TimerCardButton = ({
+  type,
+  onClick,
+  disabled = false,
+}: TimerCardButtonProps) => {
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    setIsAddingTimer(true);
+    onClick();
   };
 
+  const btnIcon =
+    type === "playPause" ? "▶️/⏸️" : type === "reset" ? "🔄" : "✏️";
+  const btnAltText =
+    type === "playPause" ? "Play/Pause" : type === "reset" ? "Reset" : "Edit";
+
   return (
-    <button onClick={handleClick} className="bg-yellow-700 w-full max-w-md">
-      +
+    <button
+      type="button"
+      onClick={handleClick}
+      aria-label={btnAltText}
+      disabled={disabled}
+      title={
+        disabled && type === "edit"
+          ? "Stop the timer before editing"
+          : undefined
+      }
+      className="bg-yellow-700 w-full max-w-md"
+    >
+      {btnIcon}
     </button>
   );
 };

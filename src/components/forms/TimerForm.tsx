@@ -9,15 +9,17 @@ interface TimerFormProps {
 }
 
 const TimerForm = ({ editingTimerId, timers, onCancel }: TimerFormProps) => {
-  const [timerType, setTimerType] = useState("stopwatch");
+  const [timerType, setTimerType] = useState<Timer["type"]>("stopwatch");
   const [timerName, setTimerName] = useState("");
   const [timerDuration, setTimerDuration] = useState("");
+  const [formError, setFormError] = useState("");
 
   const { addTimer, updateTimer } = useContext(TimersContext);
 
   const timerToEdit = editingTimerId
     ? timers?.find((t) => t.id === editingTimerId)
     : null;
+  const isEditing = timerToEdit !== null && timerToEdit !== undefined;
 
   useEffect(() => {
     if (timerToEdit) {
@@ -33,32 +35,44 @@ const TimerForm = ({ editingTimerId, timers, onCancel }: TimerFormProps) => {
 
   const handleSubmitTimer = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      if (
-        typeof timerName !== "string" ||
-        !timerName ||
-        (timerType !== "stopwatch" && timerType !== "countdown") ||
-        (timerType === "countdown" && !timerDuration)
-      ) {
-        throw new Error("Invalid form data");
-      }
+    const duration = Number(timerDuration);
+    const name = timerName.trim();
 
+    if (!name) {
+      setFormError("Enter a timer name.");
+      return;
+    }
+
+    if (
+      timerType === "countdown" &&
+      (!Number.isInteger(duration) || duration <= 0)
+    ) {
+      setFormError("Enter a whole-number duration greater than zero.");
+      return;
+    }
+
+    setFormError("");
+
+    try {
       if (timerToEdit) {
+        const configurationChanged =
+          timerToEdit.type !== timerType ||
+          (timerType === "countdown" && timerToEdit.duration !== duration);
+
         await updateTimer(timerToEdit.id, {
-          name: timerName,
+          name,
           type: timerType,
-          ...(timerType === "countdown" && timerDuration
-            ? { duration: Number(timerDuration) }
+          duration: timerType === "countdown" ? duration : undefined,
+          ...(configurationChanged
+            ? { elapsed: 0, isRunning: false, startTime: undefined }
             : {}),
           updatedAt: Date.now(),
         });
       } else {
         const timerToAdd: NewTimer = {
-          name: timerName,
+          name,
           type: timerType,
-          ...(timerType === "countdown" && timerDuration
-            ? { duration: Number(timerDuration) }
-            : {}),
+          ...(timerType === "countdown" ? { duration } : {}),
         };
 
         await addTimer(timerToAdd);
@@ -66,6 +80,7 @@ const TimerForm = ({ editingTimerId, timers, onCancel }: TimerFormProps) => {
       onCancel();
     } catch (error) {
       console.error(error);
+      setFormError("Unable to save the timer. Please try again.");
     }
   };
 
@@ -82,14 +97,21 @@ const TimerForm = ({ editingTimerId, timers, onCancel }: TimerFormProps) => {
             name="timerName"
             type="text"
             value={timerName}
-            onChange={(e) => setTimerName(e.target.value)}
+            onChange={(e) => {
+              setTimerName(e.target.value);
+              setFormError("");
+            }}
+            required
           />
         </label>
         <div className="flex gap-4">
           <label className="flex gap-2">
             Stopwatch
             <input
-              onChange={() => setTimerType("stopwatch")}
+              onChange={() => {
+                setTimerType("stopwatch");
+                setFormError("");
+              }}
               type="radio"
               name="timerType"
               value="stopwatch"
@@ -100,7 +122,10 @@ const TimerForm = ({ editingTimerId, timers, onCancel }: TimerFormProps) => {
           <label className="flex gap-2">
             Countdown
             <input
-              onChange={() => setTimerType("countdown")}
+              onChange={() => {
+                setTimerType("countdown");
+                setFormError("");
+              }}
               type="radio"
               name="timerType"
               value="countdown"
@@ -115,13 +140,20 @@ const TimerForm = ({ editingTimerId, timers, onCancel }: TimerFormProps) => {
               className="bg-gray-600 rounded-sm leading-10 px-2"
               name="duration"
               type="number"
+              min="1"
+              step="1"
               value={timerDuration}
-              onChange={(e) => setTimerDuration(e.target.value)}
+              onChange={(e) => {
+                setTimerDuration(e.target.value);
+                setFormError("");
+              }}
+              required
             />
           </label>
         ) : null}
+        {formError ? <p role="alert">{formError}</p> : null}
         <button className="w-full bg-yellow-700 rounded-md" type="submit">
-          Add
+          {isEditing ? "Update" : "Add"}
         </button>
       </form>
       <button
