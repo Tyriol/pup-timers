@@ -1,18 +1,11 @@
-import React from "react";
-
 interface AddTimerButtonProps {
-  setIsAddingTimer: React.Dispatch<React.SetStateAction<boolean>>;
+  onClick: () => void;
 }
 
-const AddTimerButton = ({ setIsAddingTimer }: AddTimerButtonProps) => {
-  return (
-    <button
-      onClick={() => setIsAddingTimer(true)}
-      className="bg-yellow-700 w-full max-w-md"
-    >
-      +
-    </button>
-  );
-};
+const AddTimerButton = ({ onClick }: AddTimerButtonProps) => (
+  <button type="button" onClick={onClick} className="primary-button add-timer">
+    <span aria-hidden="true">＋ </span>Add timer
+  </button>
+);
 
 export default AddTimerButton;

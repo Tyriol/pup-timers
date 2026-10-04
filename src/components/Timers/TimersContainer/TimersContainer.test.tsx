@@ -37,11 +37,17 @@ describe("TimersContainer editing", () => {
     expect(screen.getByRole("textbox", { name: "Timer Name:" })).toHaveValue(
       "Medication",
     );
+    expect(
+      screen.queryByRole("button", { name: "Add timer" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Edit timer" })).toHaveFocus();
     expect(screen.getByRole("radio", { name: "Countdown" })).toBeChecked();
-    expect(screen.getByRole("spinbutton", { name: "Duration:" })).toHaveValue(
-      3600,
-    );
-    expect(screen.getByRole("button", { name: "Update" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("spinbutton", { name: "Duration (seconds):" }),
+    ).toHaveValue(3600);
+    expect(
+      screen.getByRole("button", { name: "Save changes" }),
+    ).toBeInTheDocument();
   });
 
   it("returns to the timer list when editing is cancelled", () => {
@@ -51,8 +57,23 @@ describe("TimersContainer editing", () => {
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
 
     expect(
-      screen.queryByRole("button", { name: "Update" }),
+      screen.queryByRole("button", { name: "Save changes" }),
     ).not.toBeInTheDocument();
     expect(screen.getByText("Medication")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Your timers" })).toHaveFocus();
+    expect(
+      screen.getByRole("button", { name: "Add timer" }),
+    ).toBeInTheDocument();
   });
+});
+
+it("opens creation and returns focus to the list after cancelling", () => {
+  renderTimersContainer();
+  fireEvent.click(screen.getByRole("button", { name: "Add timer" }));
+  expect(screen.getByRole("heading", { name: "Add timer" })).toHaveFocus();
+  expect(
+    screen.queryByRole("button", { name: "Edit" }),
+  ).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+  expect(screen.getByRole("heading", { name: "Your timers" })).toHaveFocus();
 });

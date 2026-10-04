@@ -1,36 +1,61 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { TimersContext } from "../../../context/Context";
 import TimerDisplay from "../Timer/TimerDisplay";
 import TimerForm from "../../forms/TimerForm";
+import AddTimerButton from "../../Buttons/AddTimerButton";
 
 const TimersContainer = () => {
   const { timersList, loading } = useContext(TimersContext);
-  const [selectedTimerId, setSelectedTimerId] = useState<number | null>(null);
+  const [view, setView] = useState<"list" | "add" | number>("list");
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const hasOpenedForm = useRef(false);
 
-  const handleEditTimer = (timerId: number) => {
-    setSelectedTimerId(timerId);
-  };
+  useEffect(() => {
+    if (view !== "list") hasOpenedForm.current = true;
+    else if (hasOpenedForm.current) headingRef.current?.focus();
+  }, [view]);
 
-  if (loading) {
-    return <p>Loading...</p>;
+  if (loading)
+    return (
+      <p role="status" className="empty-state">
+        Loading timers…
+      </p>
+    );
+
+  if (view !== "list") {
+    return (
+      <TimerForm
+        editingTimerId={typeof view === "number" ? view : undefined}
+        timers={timersList}
+        onCancel={() => setView("list")}
+      />
+    );
   }
 
-  const displayedTimers = timersList.map((timer) => (
-    <TimerDisplay onEdit={handleEditTimer} key={timer.id} timer={timer} />
-  ));
-
-  return timersList.length === 0 ? (
-    <h2>Add a timer to see them here</h2>
-  ) : selectedTimerId !== null ? (
-    <TimerForm
-      editingTimerId={selectedTimerId}
-      timers={timersList}
-      onCancel={() => setSelectedTimerId(null)}
-    />
-  ) : (
-    <div className="grid grid-cols-1 gap-4 py-8 px-1 w-80 overflow-y-auto scroll-smooth">
-      {displayedTimers}
-    </div>
+  return (
+    <section aria-labelledby="timers-heading">
+      <div className="list-heading">
+        <h2 id="timers-heading" ref={headingRef} tabIndex={-1}>
+          Your timers
+        </h2>
+        <span className="muted">{timersList.length} total</span>
+      </div>
+      <AddTimerButton onClick={() => setView("add")} />
+      {timersList.length === 0 ? (
+        <div className="empty-state">
+          <h3>Your first timer starts here</h3>
+          <p>
+            Add a stopwatch to track time, or a countdown for a set duration.
+          </p>
+        </div>
+      ) : (
+        <div className="timer-list">
+          {timersList.map((timer) => (
+            <TimerDisplay onEdit={setView} key={timer.id} timer={timer} />
+          ))}
+        </div>
+      )}
+    </section>
   );
 };
 

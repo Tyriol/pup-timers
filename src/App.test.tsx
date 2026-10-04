@@ -17,13 +17,17 @@ describe("App", () => {
     );
   });
 
-  it("renders the add timer button", () => {
-    const addTimerButton = screen.getByText("+");
+  it("renders the add timer button", async () => {
+    const addTimerButton = await screen.findByRole("button", {
+      name: "Add timer",
+    });
     expect(addTimerButton).toBeInTheDocument();
   });
 
-  it("renders the add timer form when the + button is clicked", () => {
-    const addTimerButton = screen.getByText("+");
+  it("renders the add timer form when the + button is clicked", async () => {
+    const addTimerButton = await screen.findByRole("button", {
+      name: "Add timer",
+    });
     fireEvent.click(addTimerButton);
     const timerNameInput = screen.getByRole("textbox", { name: "Timer Name:" });
     expect(timerNameInput).toBeInTheDocument();
