@@ -2,12 +2,14 @@ import { useEffect, useState, useContext } from "react";
 import { formatTime, calculateElapsedTime } from "../../../lib/timers";
 import type { Timer } from "../../../types/types";
 import { TimersContext } from "../../../context/Context";
+import TimerCardButton from "../../Buttons/TimerCardButton";
 
 interface TimerProps {
   timer: Timer;
+  onEdit: (timerId: number) => void;
 }
 
-const TimerDisplay = ({ timer }: TimerProps) => {
+const TimerDisplay = ({ timer, onEdit }: TimerProps) => {
   const { updateTimer } = useContext(TimersContext);
   const [timeRemaining, setTimeRemaining] = useState<number>(
     (timer.duration ?? 0) - timer.elapsed,
@@ -17,17 +19,13 @@ const TimerDisplay = ({ timer }: TimerProps) => {
   const [stateTime, setStateTime] = useState<string>("");
   const [isRunning, setIsRunning] = useState<boolean>(timer.isRunning);
 
-  const getShadowColourClass = (isRunning: boolean, elapsedSecs: number) => {
-    if (isRunning) {
-      return "shadow-green-500";
-    } else if (!isRunning && elapsedSecs > 0) {
-      return "shadow-red-500";
-    } else {
-      return "shadow-indigo-500";
-    }
-  };
-
-  const timerCardClass = `flex flex-col items-center justify-center gap-5 p-5 shadow-md ${getShadowColourClass(isRunning, elapsedSecs)} rounded-md bg-neutral-700/50`;
+  const status = isRunning
+    ? "Running"
+    : timer.type === "countdown" && timeRemaining <= 0
+      ? "Finished"
+      : elapsedSecs > 0
+        ? "Stopped"
+        : "Ready";
 
   useEffect(() => {
     if (document.visibilityState === "visible") {
@@ -136,15 +134,46 @@ const TimerDisplay = ({ timer }: TimerProps) => {
   };
 
   return (
-    <button onClick={() => void toggleTimerOnOff()} className={timerCardClass}>
-      <h2 className="flex items-center justify-center h-[2em] leading-none">
-        {timer.name}
-      </h2>
-      <div className="text-center">
-        <p className="time">{stateDays}</p>
-        <p className="time">{stateTime}</p>
+    <article className="timer-card" aria-labelledby={`timer-${timer.id}`}>
+      <div className="card-heading">
+        <div className="timer-name">
+          <p className="eyebrow">
+            {timer.type === "countdown" ? "Countdown" : "Stopwatch"}
+          </p>
+          <h3 id={`timer-${timer.id}`}>{timer.name}</h3>
+        </div>
+        <span className={`timer-status status-${status.toLowerCase()}`}>
+          {status}
+        </span>
       </div>
-    </button>
+      <div className="timer-reading">
+        {stateDays && stateDays !== "0 days" && (
+          <p className="muted">{stateDays}</p>
+        )}
+        <p className="time">{stateTime}</p>
+        <p className="muted">
+          {timer.type === "countdown" ? "Time remaining" : "Time elapsed"}
+        </p>
+      </div>
+      <div className="timer-actions">
+        <TimerCardButton
+          label={isRunning ? "Stop" : elapsedSecs > 0 ? "Restart" : "Start"}
+          onClick={() => void toggleTimerOnOff()}
+        />
+        <TimerCardButton
+          label="Edit"
+          onClick={() => onEdit(timer.id)}
+          disabled={isRunning}
+        />
+      </div>
+      {isRunning ? (
+        <p className="card-hint">Stop the timer to edit it.</p>
+      ) : (
+        elapsedSecs > 0 && (
+          <p className="card-hint">Restart begins a new timing session.</p>
+        )
+      )}
+    </article>
   );
 };
 

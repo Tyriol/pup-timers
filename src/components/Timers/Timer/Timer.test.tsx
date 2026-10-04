@@ -34,10 +34,10 @@ const TimersProviderMock: React.FC<{ children: React.ReactNode }> = ({
   </TimersContext.Provider>
 );
 
-const renderWithContext = (timer: Timer) =>
+const renderWithContext = (timer: Timer, onEdit = vi.fn()) =>
   render(
     <TimersProviderMock>
-      <TimerDisplay timer={timer} />
+      <TimerDisplay timer={timer} onEdit={onEdit} />
     </TimersProviderMock>,
   );
 
@@ -64,9 +64,20 @@ describe("Stopwatch", () => {
     renderWithContext(baseTimer);
     expect(screen.getByText("Test Stopwatch")).toBeInTheDocument();
     expect(screen.getByText("00:00:00")).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: "Test Stopwatch 00:00:00" }),
-    ).toHaveClass("shadow-indigo-500");
+    expect(screen.getByText("Ready")).toBeInTheDocument();
+  });
+
+  it("opens editing for a stopped timer and disables editing while it is running", () => {
+    const onEdit = vi.fn();
+    const { unmount } = renderWithContext(baseTimer, onEdit);
+
+    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+    expect(onEdit).toHaveBeenCalledWith(baseTimer.id);
+
+    unmount();
+    renderWithContext({ ...baseTimer, isRunning: true }, onEdit);
+
+    expect(screen.getByRole("button", { name: "Edit" })).toBeDisabled();
   });
 
   it("calculates elapsed time and renders the correct time display", async () => {
@@ -87,9 +98,7 @@ describe("Stopwatch", () => {
   it("starts timer and increments elapsed time", async () => {
     renderWithContext({ ...baseTimer, isRunning: false });
     const currentTime = new Date("2025-08-21T10:00:00Z").getTime();
-    const startBtn = screen.getByRole("button", {
-      name: "Test Stopwatch 00:00:00",
-    });
+    const startBtn = screen.getByRole("button", { name: "Start" });
 
     await act(async () => {
       fireEvent.click(startBtn);
@@ -103,9 +112,7 @@ describe("Stopwatch", () => {
     }
 
     // Should show "Stop" button now
-    expect(
-      screen.getByRole("button", { name: "Test Stopwatch 00:00:15" }),
-    ).toHaveClass("shadow-green-500");
+    expect(screen.getByText("Running")).toBeInTheDocument();
     // Should update elapsed time
     expect(screen.getByText("00:00:15")).toBeInTheDocument();
     // updateTimer should be called for isRunning and elapsed
@@ -124,9 +131,7 @@ describe("Stopwatch", () => {
   it("stops timer when Stop is clicked", async () => {
     renderWithContext({ ...baseTimer, isRunning: true });
     const currentTime = new Date("2025-08-21T10:00:00Z").getTime();
-    const stopBtn = screen.getByRole("button", {
-      name: "Test Stopwatch 00:00:00",
-    });
+    const stopBtn = screen.getByRole("button", { name: "Stop" });
 
     await act(async () => {
       vi.advanceTimersByTime(2000);
@@ -134,9 +139,7 @@ describe("Stopwatch", () => {
     });
 
     // Should show "Start" button now
-    expect(
-      screen.getByRole("button", { name: "Test Stopwatch 00:00:02" }),
-    ).toHaveClass("shadow-red-500");
+    expect(screen.getByText("Stopped")).toBeInTheDocument();
     // updateTimer should be called for isRunning
     expect(mockUpdateTimer).toHaveBeenCalledWith(1, {
       isRunning: false,
@@ -145,17 +148,13 @@ describe("Stopwatch", () => {
     });
   });
 
-  it("shows Reset button when stopped and elapsed > 0, and resets on click", async () => {
+  it("restarts a stopped timer from zero", async () => {
     renderWithContext({ ...baseTimer, isRunning: false, elapsed: 5 });
     const currentTime = new Date("2025-08-21T10:00:00Z").getTime();
-    expect(
-      screen.getByRole("button", { name: "Test Stopwatch 00:00:05" }),
-    ).toHaveClass("shadow-red-500");
+    expect(screen.getByText("Stopped")).toBeInTheDocument();
 
     await act(async () => {
-      fireEvent.click(
-        screen.getByRole("button", { name: "Test Stopwatch 00:00:05" }),
-      );
+      fireEvent.click(screen.getByRole("button", { name: "Restart" }));
     });
 
     expect(screen.getByText("00:00:00")).toBeInTheDocument();
@@ -198,9 +197,7 @@ describe("Countdown", () => {
     renderWithContext(baseTimer);
     expect(screen.getByText("Test Countdown")).toBeInTheDocument();
     expect(screen.getByText("00:00:30")).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: "Test Countdown 00:00:30" }),
-    ).toHaveClass("shadow-indigo-500");
+    expect(screen.getByText("Ready")).toBeInTheDocument();
   });
 
   it("calculates elapsed time and renders the correct time display", async () => {
@@ -227,9 +224,7 @@ describe("Countdown", () => {
       startTime: currentTime - 100000,
     });
     expect(screen.getByText("00:00:00")).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: "Test Countdown 00:00:00" }),
-    ).toHaveClass("shadow-red-500");
+    expect(screen.getByText("Finished")).toBeInTheDocument();
     expect(mockUpdateTimer).toHaveBeenCalledWith(1, {
       elapsed: 30,
       updatedAt: currentTime,
@@ -240,9 +235,7 @@ describe("Countdown", () => {
   it("starts countdown and decrements timeRemaining", async () => {
     renderWithContext({ ...baseTimer, isRunning: false });
     const currentTime = new Date("2025-08-21T10:00:00Z").getTime();
-    const startBtn = screen.getByRole("button", {
-      name: "Test Countdown 00:00:30",
-    });
+    const startBtn = screen.getByRole("button", { name: "Start" });
 
     await act(async () => {
       fireEvent.click(startBtn);
@@ -256,9 +249,7 @@ describe("Countdown", () => {
     }
 
     // Should show the running colour of green
-    expect(
-      screen.getByRole("button", { name: "Test Countdown 00:00:15" }),
-    ).toHaveClass("shadow-green-500");
+    expect(screen.getByText("Running")).toBeInTheDocument();
     // Should update timeRemaining
     expect(screen.getByText("00:00:15")).toBeInTheDocument();
     // updateTimer should be called for isRunning and elapsed
@@ -277,9 +268,7 @@ describe("Countdown", () => {
   it("stops countdown when Stop is clicked", async () => {
     renderWithContext({ ...baseTimer, isRunning: true });
     const currentTime = new Date("2025-08-21T10:00:00Z").getTime();
-    const stopBtn = screen.getByRole("button", {
-      name: "Test Countdown 00:00:30",
-    });
+    const stopBtn = screen.getByRole("button", { name: "Stop" });
 
     await act(async () => {
       vi.advanceTimersByTime(2000);
@@ -290,9 +279,7 @@ describe("Countdown", () => {
     });
 
     // Should show red shadow now for stopped state
-    expect(
-      screen.getByRole("button", { name: "Test Countdown 00:00:28" }),
-    ).toHaveClass("shadow-red-500");
+    expect(screen.getByText("Stopped")).toBeInTheDocument();
     expect(screen.getByText("00:00:28")).toBeInTheDocument();
     // updateTimer should be called for isRunning
     expect(mockUpdateTimer).toHaveBeenCalledWith(1, {
@@ -302,17 +289,13 @@ describe("Countdown", () => {
     });
   });
 
-  it("shows Reset button when stopped and elapsed > 0, and resets on click", async () => {
+  it("restarts a stopped timer from zero", async () => {
     renderWithContext({ ...baseTimer, isRunning: false, elapsed: 3 });
     const currentTime = new Date("2025-08-21T10:00:00Z").getTime();
-    expect(
-      screen.getByRole("button", { name: "Test Countdown 00:00:27" }),
-    ).toHaveClass("shadow-red-500");
+    expect(screen.getByText("Stopped")).toBeInTheDocument();
 
     await act(async () => {
-      fireEvent.click(
-        screen.getByRole("button", { name: "Test Countdown 00:00:27" }),
-      );
+      fireEvent.click(screen.getByRole("button", { name: "Restart" }));
     });
 
     expect(screen.getByText("00:00:30")).toBeInTheDocument();
@@ -328,9 +311,7 @@ describe("Countdown", () => {
     renderWithContext({ ...baseTimer, isRunning: true, elapsed: 28 });
     const currentTime = new Date("2025-08-21T10:00:00Z").getTime();
 
-    expect(
-      screen.getByRole("button", { name: "Test Countdown 00:00:02" }),
-    ).toHaveClass("shadow-green-500");
+    expect(screen.getByText("Running")).toBeInTheDocument();
 
     for (let i = 0; i < 2; i++) {
       await act(async () => {
@@ -338,9 +319,7 @@ describe("Countdown", () => {
       });
     }
 
-    expect(
-      screen.getByRole("button", { name: "Test Countdown 00:00:00" }),
-    ).toBeInTheDocument();
+    expect(screen.getByText("00:00:00")).toBeInTheDocument();
     expect(mockUpdateTimer).toHaveBeenCalledWith(1, {
       elapsed: 30,
       isRunning: false,

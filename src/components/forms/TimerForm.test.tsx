@@ -1,9 +1,11 @@
-import { describe, it, vi, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, vi, expect } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import { TimersContext } from "../../context/Context";
 import TimerForm from "./TimerForm";
+import type { Timer } from "../../types/types";
 
 const mockAddTimer = vi.fn(() => Promise.resolve(1));
+const mockUpdateTimer = vi.fn(() => Promise.resolve());
 
 const TimersProviderMock: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -13,7 +15,7 @@ const TimersProviderMock: React.FC<{ children: React.ReactNode }> = ({
       timersList: [],
       loading: true,
       addTimer: mockAddTimer,
-      updateTimer: vi.fn(),
+      updateTimer: mockUpdateTimer,
       deleteTimer: vi.fn(),
     }}
   >
@@ -21,20 +23,18 @@ const TimersProviderMock: React.FC<{ children: React.ReactNode }> = ({
   </TimersContext.Provider>
 );
 
-const renderWithProp = (
-  setIsAddingTimer: React.Dispatch<React.SetStateAction<boolean>>,
-) => {
+const renderWithProp = (onCancel: () => void) => {
   render(
     <TimersProviderMock>
-      <TimerForm setIsAddingTimer={setIsAddingTimer} />
+      <TimerForm onCancel={onCancel} />
     </TimersProviderMock>,
   );
 };
 
 describe("Timer Form Rendering", () => {
   it("Renders the form with inputs for Timer name and type, a close button and an add button", () => {
-    const setIsAddingTimer = vi.fn();
-    renderWithProp(setIsAddingTimer);
+    const onCancel = vi.fn();
+    renderWithProp(onCancel);
 
     expect(
       screen.getByRole("textbox", { name: "Timer Name:" }),
@@ -46,7 +46,9 @@ describe("Timer Form Rendering", () => {
       screen.getByRole("radio", { name: "Countdown" }),
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Cancel" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Add" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Create timer" }),
+    ).toBeInTheDocument();
   });
 
   it("doesn't render the duration field if Stopwatch is selected", () => {
@@ -55,7 +57,7 @@ describe("Timer Form Rendering", () => {
     const stopwatchRadioBtn = screen.getByRole("radio", { name: "Stopwatch" });
     fireEvent.click(stopwatchRadioBtn);
     expect(
-      screen.queryByRole("spinbutton", { name: "Duration:" }),
+      screen.queryByRole("spinbutton", { name: "Duration (seconds):" }),
     ).not.toBeInTheDocument();
   });
 
@@ -65,30 +67,30 @@ describe("Timer Form Rendering", () => {
     const countdownRadioBtn = screen.getByRole("radio", { name: "Countdown" });
     fireEvent.click(countdownRadioBtn);
     expect(
-      screen.queryByRole("spinbutton", { name: "Duration:" }),
+      screen.queryByRole("spinbutton", { name: "Duration (seconds):" }),
     ).toBeInTheDocument();
   });
 });
 
 describe("Timer form logic", () => {
-  it("calls setIsAddingTimer(false) when the close button is clicked", () => {
-    const setIsAddingTimer = vi.fn();
+  it("calls onCancel() when the close button is clicked", () => {
+    const onCancel = vi.fn();
 
-    renderWithProp(setIsAddingTimer);
+    renderWithProp(onCancel);
     const closeBtn = screen.getByText("Cancel");
 
     fireEvent.click(closeBtn);
 
-    expect(setIsAddingTimer).toHaveBeenCalledWith(false);
+    expect(onCancel).toHaveBeenCalled();
   });
 
   it("submits the form with valid data for a stopwatch", async () => {
-    const setIsAddingTimer = vi.fn();
-    renderWithProp(setIsAddingTimer);
+    const onCancel = vi.fn();
+    renderWithProp(onCancel);
 
     const nameField = screen.getByRole("textbox", { name: "Timer Name:" });
     const stopwatchRadioBtn = screen.getByRole("radio", { name: "Stopwatch" });
-    const addBtn = screen.getByRole("button", { name: "Add" });
+    const addBtn = screen.getByRole("button", { name: "Create timer" });
 
     fireEvent.change(nameField, { target: { value: "Test S Timer" } });
     fireEvent.click(stopwatchRadioBtn);
@@ -103,17 +105,19 @@ describe("Timer form logic", () => {
   });
 
   it("submits the form with valid data for a countdown", async () => {
-    const setIsAddingTimer = vi.fn();
-    renderWithProp(setIsAddingTimer);
+    const onCancel = vi.fn();
+    renderWithProp(onCancel);
 
     const nameField = screen.getByRole("textbox", { name: "Timer Name:" });
     const countdownRadioBtn = screen.getByRole("radio", { name: "Countdown" });
-    const addBtn = screen.getByRole("button", { name: "Add" });
+    const addBtn = screen.getByRole("button", { name: "Create timer" });
 
     fireEvent.change(nameField, { target: { value: "Test C Timer" } });
     fireEvent.click(countdownRadioBtn);
 
-    const durationField = screen.getByRole("spinbutton", { name: "Duration:" });
+    const durationField = screen.getByRole("spinbutton", {
+      name: "Duration (seconds):",
+    });
 
     fireEvent.change(durationField, { target: { value: 300 } });
 
@@ -127,40 +131,120 @@ describe("Timer form logic", () => {
       duration: 300,
     });
   });
+
+  it("prefills a timer and updates it instead of adding a new timer", async () => {
+    const onCancel = vi.fn();
+    const timer: Timer = {
+      id: 7,
+      name: "Breakfast",
+      type: "stopwatch",
+      elapsed: 0,
+      isRunning: false,
+    };
+
+    render(
+      <TimersProviderMock>
+        <TimerForm
+          editingTimerId={timer.id}
+          timers={[timer]}
+          onCancel={onCancel}
+        />
+      </TimersProviderMock>,
+    );
+
+    const nameField = screen.getByRole("textbox", { name: "Timer Name:" });
+    expect(nameField).toHaveValue("Breakfast");
+    expect(
+      screen.getByRole("button", { name: "Save changes" }),
+    ).toBeInTheDocument();
+
+    fireEvent.change(nameField, { target: { value: "Evening walk" } });
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+    });
+
+    expect(mockUpdateTimer).toHaveBeenCalledWith(
+      7,
+      expect.objectContaining({
+        name: "Evening walk",
+        type: "stopwatch",
+        duration: undefined,
+        updatedAt: expect.any(Number),
+      }),
+    );
+    expect(onCancel).toHaveBeenCalled();
+  });
 });
 
 describe("TimerForm error handling", () => {
-  let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
+  it("shows an error if no name is submitted", () => {
+    const onCancel = vi.fn();
+    renderWithProp(onCancel);
 
-  beforeEach(() => {
-    consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const addBtn = screen.getByRole("button", { name: "Create timer" });
+
+    const form = addBtn.closest("form");
+    if (!form) {
+      throw new Error("Timer form was not rendered");
+    }
+    fireEvent.submit(form);
+
+    expect(screen.getByRole("alert")).toHaveTextContent("Enter a timer name.");
   });
 
-  afterEach(() => {
-    consoleErrorSpy.mockRestore();
-  });
-
-  it("consoles an error if no data is submitted", () => {
+  it("shows an error if a countdown duration is not positive whole seconds", () => {
     const setIsAddingTimer = vi.fn();
     renderWithProp(setIsAddingTimer);
 
-    const addBtn = screen.getByRole("button", { name: "Add" });
-
-    fireEvent.click(addBtn);
-
-    expect(consoleErrorSpy).toHaveBeenCalled();
-  });
-
-  it("consoles an error if type is countdown and no duration is submitted", () => {
-    const setIsAddingTimer = vi.fn();
-    renderWithProp(setIsAddingTimer);
-
-    const addBtn = screen.getByRole("button", { name: "Add" });
+    const addBtn = screen.getByRole("button", { name: "Create timer" });
     const countdownRadioBtn = screen.getByRole("radio", { name: "Countdown" });
 
     fireEvent.click(countdownRadioBtn);
-    fireEvent.click(addBtn);
+    fireEvent.change(screen.getByRole("textbox", { name: "Timer Name:" }), {
+      target: { value: "Medication" },
+    });
+    fireEvent.change(
+      screen.getByRole("spinbutton", { name: "Duration (seconds):" }),
+      {
+        target: { value: "0" },
+      },
+    );
 
-    expect(consoleErrorSpy).toHaveBeenCalled();
+    const form = addBtn.closest("form");
+    if (!form) {
+      throw new Error("Timer form was not rendered");
+    }
+    fireEvent.submit(form);
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Enter a whole-number duration greater than zero.",
+    );
   });
+});
+
+it("prevents repeated saves and keeps the form open on failure", async () => {
+  let rejectSave: (reason: Error) => void = () => {};
+  mockAddTimer.mockImplementationOnce(
+    () =>
+      new Promise<number>((_resolve, reject) => {
+        rejectSave = reject;
+      }),
+  );
+  const onCancel = vi.fn();
+  const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+  renderWithProp(onCancel);
+  fireEvent.change(screen.getByRole("textbox", { name: "Timer Name:" }), {
+    target: { value: "Walk" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "Create timer" }));
+  expect(screen.getByRole("button", { name: "Saving…" })).toBeDisabled();
+  expect(screen.getByRole("button", { name: "Cancel" })).toBeDisabled();
+  expect(screen.getByRole("textbox")).toBeDisabled();
+  await act(async () => {
+    rejectSave(new Error("Storage unavailable"));
+  });
+  expect(screen.getByRole("alert")).toHaveTextContent("Unable to save");
+  expect(screen.getByRole("button", { name: "Create timer" })).toBeEnabled();
+  expect(onCancel).not.toHaveBeenCalled();
+  consoleError.mockRestore();
 });

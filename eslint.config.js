@@ -21,7 +21,13 @@ export default tseslint.config([
       js.configs.recommended,
       ...tseslint.configs.recommendedTypeChecked,
       ...tseslint.configs.stylisticTypeChecked,
-      reactHooks.configs["recommended-latest"],
+      {
+        plugins: { "react-hooks": reactHooks },
+        rules: {
+          "react-hooks/rules-of-hooks": "error",
+          "react-hooks/exhaustive-deps": "warn",
+        },
+      },
       reactRefresh.configs.vite,
     ],
     languageOptions: {
