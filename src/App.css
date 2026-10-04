@@ -1,15 +1,186 @@
+.app-shell {
+  width: 100%;
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 2rem 1rem max(2rem, env(safe-area-inset-bottom));
+}
+.app-header {
+  margin-bottom: 2rem;
+}
+.eyebrow {
+  color: #52685e;
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+.muted,
+.card-hint {
+  color: #52685e;
+  font-size: 0.9rem;
+}
+.list-heading,
+.card-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.list-heading {
+  margin-bottom: 1rem;
+}
+.primary-button {
+  background: #21634e;
+  color: white;
+  border: 1px solid #21634e;
+}
+.primary-button:hover:not(:disabled) {
+  background: #174d3c;
+}
+.secondary-button {
+  background: #f3f6f2;
+  color: #294b3d;
+  border: 1px solid #c8d6cd;
+}
+.secondary-button:hover:not(:disabled) {
+  background: #e5eee7;
+}
+.add-timer {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+.timer-list {
+  display: grid;
+  gap: 1rem;
+}
+.timer-card,
+.form-panel,
+.empty-state {
+  background: #fff;
+  border: 1px solid #d8e1da;
+  border-radius: 18px;
+  padding: 1.25rem;
+}
+.timer-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.card-heading {
+  align-items: flex-start;
+}
+.timer-status {
+  flex-shrink: 0;
+  padding: 0.25rem 0.6rem;
+  border-radius: 99px;
+  font-size: 0.8rem;
+  font-weight: 650;
+  background: #edf1ed;
+  color: #465c50;
+}
+.status-running {
+  background: #dff3e6;
+  color: #16532a;
+}
+.status-finished {
+  background: #fff0cb;
+  color: #724c0b;
+}
+.status-stopped {
+  background: #f4e7e0;
+  color: #793d26;
+}
+.timer-reading {
+  padding: 1.25rem 0;
+}
 .time {
-  font-family: "cursed_timer_ulilregular", monospace;
-  font-size: 1.1rem;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(2rem, 9vw, 3.25rem);
+  font-weight: 650;
+  letter-spacing: -0.04em;
+  line-height: 1.2;
 }
-
-h1,
-h2,
-h3 {
-  font-weight: 400;
-  text-transform: capitalize;
+.timer-actions {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 0.75rem;
 }
-
-h2 {
-  font-size: 1.2rem;
+.card-hint {
+  margin-top: 0.75rem;
+}
+.empty-state {
+  text-align: center;
+  padding: 2rem 1.25rem;
+}
+.empty-state p {
+  color: #52685e;
+  margin-top: 0.5rem;
+}
+.form-intro {
+  margin: 0.5rem 0 1.5rem;
+}
+.timer-form,
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+.form-fields,
+.type-options {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.text-input {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid #a9bbb0;
+  border-radius: 10px;
+  background: white;
+  color: #20332d;
+  padding: 0.65rem 0.75rem;
+}
+.type-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.type-options legend {
+  margin-bottom: 0.5rem;
+}
+.type-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex: 1;
+  min-height: 48px;
+  border: 1px solid #a9bbb0;
+  border-radius: 10px;
+  padding: 0.65rem;
+  cursor: pointer;
+}
+.type-option:has(:checked) {
+  background: #e4f1e8;
+  border-color: #21634e;
+}
+input[type="radio"] {
+  accent-color: #21634e;
+  width: 1.1rem;
+  height: 1.1rem;
+}
+.cancel-button {
+  width: 100%;
+  margin-top: 0.75rem;
+}
+[role="alert"] {
+  color: #a1261d;
+}
+@media (min-width: 600px) {
+  .app-shell {
+    padding-top: 3rem;
+  }
+  .timer-card,
+  .form-panel {
+    padding: 1.5rem;
+  }
 }

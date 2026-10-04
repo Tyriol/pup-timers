@@ -1,42 +1,22 @@
-import React from "react";
-
 interface TimerCardButtonProps {
-  type: "playPause" | "reset" | "edit";
+  label: "Start" | "Stop" | "Restart" | "Edit";
   onClick: () => void;
   disabled?: boolean;
 }
 
 const TimerCardButton = ({
-  type,
+  label,
   onClick,
   disabled = false,
-}: TimerCardButtonProps) => {
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-    onClick();
-  };
-
-  const btnIcon =
-    type === "playPause" ? "▶️/⏸️" : type === "reset" ? "🔄" : "✏️";
-  const btnAltText =
-    type === "playPause" ? "Play/Pause" : type === "reset" ? "Reset" : "Edit";
-
-  return (
-    <button
-      type="button"
-      onClick={handleClick}
-      aria-label={btnAltText}
-      disabled={disabled}
-      title={
-        disabled && type === "edit"
-          ? "Stop the timer before editing"
-          : undefined
-      }
-      className="bg-yellow-700 w-full max-w-md"
-    >
-      {btnIcon}
-    </button>
-  );
-};
+}: TimerCardButtonProps) => (
+  <button
+    type="button"
+    onClick={onClick}
+    disabled={disabled}
+    className={label === "Edit" ? "secondary-button" : "primary-button"}
+  >
+    {label}
+  </button>
+);
 
 export default TimerCardButton;

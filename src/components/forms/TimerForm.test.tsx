@@ -46,7 +46,9 @@ describe("Timer Form Rendering", () => {
       screen.getByRole("radio", { name: "Countdown" }),
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Cancel" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Add" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Create timer" }),
+    ).toBeInTheDocument();
   });
 
   it("doesn't render the duration field if Stopwatch is selected", () => {
@@ -55,7 +57,7 @@ describe("Timer Form Rendering", () => {
     const stopwatchRadioBtn = screen.getByRole("radio", { name: "Stopwatch" });
     fireEvent.click(stopwatchRadioBtn);
     expect(
-      screen.queryByRole("spinbutton", { name: "Duration:" }),
+      screen.queryByRole("spinbutton", { name: "Duration (seconds):" }),
     ).not.toBeInTheDocument();
   });
 
@@ -65,7 +67,7 @@ describe("Timer Form Rendering", () => {
     const countdownRadioBtn = screen.getByRole("radio", { name: "Countdown" });
     fireEvent.click(countdownRadioBtn);
     expect(
-      screen.queryByRole("spinbutton", { name: "Duration:" }),
+      screen.queryByRole("spinbutton", { name: "Duration (seconds):" }),
     ).toBeInTheDocument();
   });
 });
@@ -88,7 +90,7 @@ describe("Timer form logic", () => {
 
     const nameField = screen.getByRole("textbox", { name: "Timer Name:" });
     const stopwatchRadioBtn = screen.getByRole("radio", { name: "Stopwatch" });
-    const addBtn = screen.getByRole("button", { name: "Add" });
+    const addBtn = screen.getByRole("button", { name: "Create timer" });
 
     fireEvent.change(nameField, { target: { value: "Test S Timer" } });
     fireEvent.click(stopwatchRadioBtn);
@@ -108,12 +110,14 @@ describe("Timer form logic", () => {
 
     const nameField = screen.getByRole("textbox", { name: "Timer Name:" });
     const countdownRadioBtn = screen.getByRole("radio", { name: "Countdown" });
-    const addBtn = screen.getByRole("button", { name: "Add" });
+    const addBtn = screen.getByRole("button", { name: "Create timer" });
 
     fireEvent.change(nameField, { target: { value: "Test C Timer" } });
     fireEvent.click(countdownRadioBtn);
 
-    const durationField = screen.getByRole("spinbutton", { name: "Duration:" });
+    const durationField = screen.getByRole("spinbutton", {
+      name: "Duration (seconds):",
+    });
 
     fireEvent.change(durationField, { target: { value: 300 } });
 
@@ -150,11 +154,13 @@ describe("Timer form logic", () => {
 
     const nameField = screen.getByRole("textbox", { name: "Timer Name:" });
     expect(nameField).toHaveValue("Breakfast");
-    expect(screen.getByRole("button", { name: "Update" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Save changes" }),
+    ).toBeInTheDocument();
 
     fireEvent.change(nameField, { target: { value: "Evening walk" } });
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: "Update" }));
+      fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
     });
 
     expect(mockUpdateTimer).toHaveBeenCalledWith(
@@ -175,7 +181,7 @@ describe("TimerForm error handling", () => {
     const onCancel = vi.fn();
     renderWithProp(onCancel);
 
-    const addBtn = screen.getByRole("button", { name: "Add" });
+    const addBtn = screen.getByRole("button", { name: "Create timer" });
 
     const form = addBtn.closest("form");
     if (!form) {
@@ -190,16 +196,19 @@ describe("TimerForm error handling", () => {
     const setIsAddingTimer = vi.fn();
     renderWithProp(setIsAddingTimer);
 
-    const addBtn = screen.getByRole("button", { name: "Add" });
+    const addBtn = screen.getByRole("button", { name: "Create timer" });
     const countdownRadioBtn = screen.getByRole("radio", { name: "Countdown" });
 
     fireEvent.click(countdownRadioBtn);
     fireEvent.change(screen.getByRole("textbox", { name: "Timer Name:" }), {
       target: { value: "Medication" },
     });
-    fireEvent.change(screen.getByRole("spinbutton", { name: "Duration:" }), {
-      target: { value: "0" },
-    });
+    fireEvent.change(
+      screen.getByRole("spinbutton", { name: "Duration (seconds):" }),
+      {
+        target: { value: "0" },
+      },
+    );
 
     const form = addBtn.closest("form");
     if (!form) {
@@ -211,4 +220,31 @@ describe("TimerForm error handling", () => {
       "Enter a whole-number duration greater than zero.",
     );
   });
+});
+
+it("prevents repeated saves and keeps the form open on failure", async () => {
+  let rejectSave: (reason: Error) => void = () => {};
+  mockAddTimer.mockImplementationOnce(
+    () =>
+      new Promise<number>((_resolve, reject) => {
+        rejectSave = reject;
+      }),
+  );
+  const onCancel = vi.fn();
+  const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+  renderWithProp(onCancel);
+  fireEvent.change(screen.getByRole("textbox", { name: "Timer Name:" }), {
+    target: { value: "Walk" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "Create timer" }));
+  expect(screen.getByRole("button", { name: "Saving…" })).toBeDisabled();
+  expect(screen.getByRole("button", { name: "Cancel" })).toBeDisabled();
+  expect(screen.getByRole("textbox")).toBeDisabled();
+  await act(async () => {
+    rejectSave(new Error("Storage unavailable"));
+  });
+  expect(screen.getByRole("alert")).toHaveTextContent("Unable to save");
+  expect(screen.getByRole("button", { name: "Create timer" })).toBeEnabled();
+  expect(onCancel).not.toHaveBeenCalled();
+  consoleError.mockRestore();
 });
