@@ -1,5 +1,3 @@
-@import "tailwindcss";
-
 :root {
   font-family:
     system-ui,
@@ -14,17 +12,21 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
+
 body {
   margin: 0;
   min-width: 280px;
 }
+
 #root {
   min-height: 100dvh;
 }
+
 button,
 input {
   font: inherit;
 }
+
 button {
   min-height: 48px;
   padding: 0.7rem 1rem;
@@ -32,29 +34,42 @@ button {
   font-weight: 650;
   cursor: pointer;
 }
+
 button:disabled {
   cursor: not-allowed;
   opacity: 0.55;
 }
+
 :focus-visible {
   outline: 3px solid #176c58;
   outline-offset: 4px;
 }
+
+.form-label {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 0.5rem;
+}
+
 h1,
 h2,
 h3,
 p {
   margin: 0;
 }
+
 h1 {
   font-size: 2rem;
   font-weight: 750;
   letter-spacing: -0.04em;
 }
+
 h2 {
   font-size: 1.25rem;
   font-weight: 700;
 }
+
 h3 {
   font-size: 1.15rem;
   font-weight: 700;

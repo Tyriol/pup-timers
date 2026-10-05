@@ -108,7 +108,7 @@ const TimerForm = ({ editingTimerId, timers, onCancel }: TimerFormProps) => {
         onSubmit={(e) => void handleSubmitTimer(e)}
       >
         <fieldset className="form-fields" disabled={isSaving}>
-          <label className="flex flex-col w-full gap-2">
+          <label className="form-label">
             Timer Name:
             <input
               className="text-input"
@@ -158,7 +158,7 @@ const TimerForm = ({ editingTimerId, timers, onCancel }: TimerFormProps) => {
               : "Counts down from your chosen duration."}
           </p>
           {timerType === "countdown" ? (
-            <label className="flex flex-col w-full gap-2">
+            <label className="form-label">
               Duration (seconds):
               <input
                 className="text-input"
