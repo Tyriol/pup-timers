@@ -18,11 +18,17 @@ Clone the repo down from
 https://github.com/Tyriol/pup-timer.git
 ```
 
+Use Node.js 24 and enable pnpm through Corepack (the version is pinned in `package.json`):
+
+```sh
+corepack enable
+```
+
 Now you have a few options. You can either:
 
 ```
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 ```
 
 This will start up a regular Vite app on port `5173`
@@ -65,23 +71,23 @@ The container is setup to allow for hot reloading so you don't have to build a n
 If you would like to run tests while working on a piece rather than needing to commit or have the CI do it on PR, you can run the following scripts:
 
 ```
-npm run test:unit
+pnpm run test:unit
 ```
 
 This will run all unit tests using Vitest and React testing library
 
 ```
-npm run test:e2e
+pnpm run test:e2e
 
 or
 
-npm run test:e2e:open
+pnpm run test:e2e:open
 ```
 
 These commands will run the Cypress end-to-end tests. The second command will open the Cypress UI so you can run them that way rather than in the CLI
 
 ```
-npm run test:coverage
+pnpm run test:coverage
 ```
 
 This will generate coverage reports, however I'd recommend leaving this to the CI workflow as it's best integrated with CodeCov

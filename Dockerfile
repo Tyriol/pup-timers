@@ -1,13 +1,16 @@
 FROM node:24-alpine3.21
 
+RUN corepack enable
+
 WORKDIR /app
 
-COPY package*.json ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-RUN --mount=type=cache,target=/root/.npm npm install
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    CYPRESS_INSTALL_BINARY=0 HUSKY=0 pnpm install --frozen-lockfile --store-dir=/pnpm/store
 
 COPY . .
 
 EXPOSE 5173
 
-CMD ["npm", "run", "dev"]
+CMD ["pnpm", "run", "dev"]
