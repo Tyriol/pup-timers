@@ -7,10 +7,13 @@ import TimerCardButton from "../../Buttons/TimerCardButton";
 interface TimerProps {
   timer: Timer;
   onEdit: (timerId: number) => void;
+  onDeleted: () => void;
 }
 
-const TimerDisplay = ({ timer, onEdit }: TimerProps) => {
-  const { updateTimer } = useContext(TimersContext);
+const TimerDisplay = ({ timer, onEdit, onDeleted }: TimerProps) => {
+  const { updateTimer, deleteTimer } = useContext(TimersContext);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
   const [timeRemaining, setTimeRemaining] = useState<number>(
     (timer.duration ?? 0) - timer.elapsed,
   );
@@ -133,6 +136,18 @@ const TimerDisplay = ({ timer, onEdit }: TimerProps) => {
     });
   };
 
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    setDeleteError("");
+    try {
+      await deleteTimer(timer.id);
+      onDeleted();
+    } catch {
+      setDeleteError("Could not delete this timer. Please try again.");
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <article className="timer-card" aria-labelledby={`timer-${timer.id}`}>
       <div className="card-heading">
@@ -159,13 +174,20 @@ const TimerDisplay = ({ timer, onEdit }: TimerProps) => {
         <TimerCardButton
           label={isRunning ? "Stop" : elapsedSecs > 0 ? "Restart" : "Start"}
           onClick={() => void toggleTimerOnOff()}
+          disabled={isDeleting}
         />
         <TimerCardButton
           label="Edit"
           onClick={() => onEdit(timer.id)}
-          disabled={isRunning}
+          disabled={isRunning || isDeleting}
+        />
+        <TimerCardButton
+          label="Delete"
+          onClick={() => void handleDelete()}
+          disabled={isRunning || isDeleting}
         />
       </div>
+      {deleteError && <p role="alert">{deleteError}</p>}
       {isRunning ? (
         <p className="card-hint">Stop the timer to edit it.</p>
       ) : (
