@@ -37,7 +37,7 @@ const TimersProviderMock: React.FC<{ children: React.ReactNode }> = ({
 const renderWithContext = (timer: Timer, onEdit = vi.fn()) =>
   render(
     <TimersProviderMock>
-      <TimerDisplay timer={timer} onEdit={onEdit} />
+      <TimerDisplay timer={timer} onEdit={onEdit} onDeleted={vi.fn()} />
     </TimersProviderMock>,
   );
 

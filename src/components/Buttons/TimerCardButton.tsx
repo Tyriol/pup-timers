@@ -1,5 +1,5 @@
 interface TimerCardButtonProps {
-  label: "Start" | "Stop" | "Restart" | "Edit";
+  label: "Start" | "Stop" | "Restart" | "Edit" | "Delete";
   onClick: () => void;
   disabled?: boolean;
 }
@@ -13,7 +13,11 @@ const TimerCardButton = ({
     type="button"
     onClick={onClick}
     disabled={disabled}
-    className={label === "Edit" ? "secondary-button" : "primary-button"}
+    className={
+      label === "Edit" || label === "Delete"
+        ? "secondary-button"
+        : "primary-button"
+    }
   >
     {label}
   </button>

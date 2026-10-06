@@ -106,7 +106,7 @@
 }
 .timer-actions {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr));
   gap: 0.75rem;
 }
 .card-hint {

@@ -85,6 +85,7 @@ export const TimersProvider = ({ children }: TimersProviderProps) => {
       }
     } catch (error) {
       console.error(error);
+      throw error;
     }
   };
 

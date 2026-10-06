@@ -51,7 +51,12 @@ const TimersContainer = () => {
       ) : (
         <div className="timer-list">
           {timersList.map((timer) => (
-            <TimerDisplay onEdit={setView} key={timer.id} timer={timer} />
+            <TimerDisplay
+              onEdit={setView}
+              onDeleted={() => headingRef.current?.focus()}
+              key={timer.id}
+              timer={timer}
+            />
           ))}
         </div>
       )}
