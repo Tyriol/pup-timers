@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeAll, afterAll } from "vitest";
-import { getTimeFromSeconds, formatTime, calculateElapsedTime } from "./timers";
+import {
+  getTimeFromSeconds,
+  formatTime,
+  calculateElapsedTime,
+  convertDurationToSeconds,
+  getDurationInputFromSeconds,
+} from "./timers";
 
 describe("The timer utility functions", () => {
   beforeAll(() => {
@@ -51,4 +57,24 @@ describe("The timer utility functions", () => {
     const elapsed = calculateElapsedTime(currentTime, startTime);
     expect(elapsed).toBe(0);
   });
+
+  it.each([
+    [1, "minutes", 60],
+    [3, "weeks", 1_814_400],
+    [1, "months", 2_592_000],
+  ] as const)("converts %i %s to seconds", (duration, unit, seconds) => {
+    expect(convertDurationToSeconds(duration, unit)).toBe(seconds);
+  });
+
+  it.each([
+    [2_592_000, 1, "months"],
+    [1_814_400, 3, "weeks"],
+    [300, 5, "minutes"],
+    [30, 30, "seconds"],
+  ] as const)(
+    "uses the largest exact unit when converting %i seconds for editing",
+    (seconds, duration, unit) => {
+      expect(getDurationInputFromSeconds(seconds)).toEqual({ duration, unit });
+    },
+  );
 });

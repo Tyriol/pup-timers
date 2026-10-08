@@ -52,9 +52,8 @@ describe("TimersContainer editing", () => {
     ).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Edit timer" })).toHaveFocus();
     expect(screen.getByRole("radio", { name: "Countdown" })).toBeChecked();
-    expect(
-      screen.getByRole("spinbutton", { name: "Duration (seconds):" }),
-    ).toHaveValue(3600);
+    expect(screen.getByRole("spinbutton", { name: "Amount" })).toHaveValue(1);
+    expect(screen.getByRole("combobox", { name: "Unit" })).toHaveValue("hours");
     expect(
       screen.getByRole("button", { name: "Save changes" }),
     ).toBeInTheDocument();

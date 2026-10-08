@@ -1,3 +1,41 @@
+export const durationUnitSeconds = {
+  seconds: 1,
+  minutes: 60,
+  hours: 60 * 60,
+  days: 60 * 60 * 24,
+  weeks: 60 * 60 * 24 * 7,
+  months: 60 * 60 * 24 * 30,
+} as const;
+
+export type DurationUnit = keyof typeof durationUnitSeconds;
+
+export const isDurationUnit = (unit: string): unit is DurationUnit =>
+  Object.hasOwn(durationUnitSeconds, unit);
+
+export const convertDurationToSeconds = (
+  duration: number,
+  unit: DurationUnit,
+) => duration * durationUnitSeconds[unit];
+
+export const getDurationInputFromSeconds = (seconds: number) => {
+  const units: DurationUnit[] = [
+    "months",
+    "weeks",
+    "days",
+    "hours",
+    "minutes",
+    "seconds",
+  ];
+  const unit =
+    units.find((candidate) => seconds % durationUnitSeconds[candidate] === 0) ??
+    "seconds";
+
+  return {
+    duration: seconds / durationUnitSeconds[unit],
+    unit,
+  };
+};
+
 export const getTimeFromSeconds = (secs: number) => {
   const days = Math.floor(secs / (60 * 60 * 24));
   const hours = Math.floor((secs % (60 * 60 * 24)) / (60 * 60));
