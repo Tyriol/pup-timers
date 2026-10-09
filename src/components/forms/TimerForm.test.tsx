@@ -57,7 +57,7 @@ describe("Timer Form Rendering", () => {
     const stopwatchRadioBtn = screen.getByRole("radio", { name: "Stopwatch" });
     fireEvent.click(stopwatchRadioBtn);
     expect(
-      screen.queryByRole("spinbutton", { name: "Duration (seconds):" }),
+      screen.queryByRole("spinbutton", { name: "Amount" }),
     ).not.toBeInTheDocument();
   });
 
@@ -67,8 +67,11 @@ describe("Timer Form Rendering", () => {
     const countdownRadioBtn = screen.getByRole("radio", { name: "Countdown" });
     fireEvent.click(countdownRadioBtn);
     expect(
-      screen.queryByRole("spinbutton", { name: "Duration (seconds):" }),
+      screen.queryByRole("spinbutton", { name: "Amount" }),
     ).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Unit" })).toHaveValue(
+      "minutes",
+    );
   });
 });
 
@@ -116,10 +119,10 @@ describe("Timer form logic", () => {
     fireEvent.click(countdownRadioBtn);
 
     const durationField = screen.getByRole("spinbutton", {
-      name: "Duration (seconds):",
+      name: "Amount",
     });
 
-    fireEvent.change(durationField, { target: { value: 300 } });
+    fireEvent.change(durationField, { target: { value: 5 } });
 
     await act(async () => {
       fireEvent.click(addBtn);
@@ -131,6 +134,39 @@ describe("Timer form logic", () => {
       duration: 300,
     });
   });
+
+  it.each([
+    [1, "minutes", 60],
+    [3, "weeks", 1_814_400],
+    [1, "months", 2_592_000],
+  ] as const)(
+    "creates a countdown lasting %i %s",
+    async (amount, unit, duration) => {
+      const onCancel = vi.fn();
+      renderWithProp(onCancel);
+
+      fireEvent.change(screen.getByRole("textbox", { name: "Timer Name:" }), {
+        target: { value: "Medication" },
+      });
+      fireEvent.click(screen.getByRole("radio", { name: "Countdown" }));
+      fireEvent.change(screen.getByRole("spinbutton", { name: "Amount" }), {
+        target: { value: amount },
+      });
+      fireEvent.change(screen.getByRole("combobox", { name: "Unit" }), {
+        target: { value: unit },
+      });
+
+      await act(async () => {
+        fireEvent.click(screen.getByRole("button", { name: "Create timer" }));
+      });
+
+      expect(mockAddTimer).toHaveBeenCalledWith({
+        name: "Medication",
+        type: "countdown",
+        duration,
+      });
+    },
+  );
 
   it("prefills a timer and updates it instead of adding a new timer", async () => {
     const onCancel = vi.fn();
@@ -174,6 +210,30 @@ describe("Timer form logic", () => {
     );
     expect(onCancel).toHaveBeenCalled();
   });
+
+  it("prefills a countdown using the largest exact duration unit", () => {
+    const timer: Timer = {
+      id: 8,
+      name: "Flea treatment",
+      type: "countdown",
+      duration: 1_814_400,
+      elapsed: 0,
+      isRunning: false,
+    };
+
+    render(
+      <TimersProviderMock>
+        <TimerForm
+          editingTimerId={timer.id}
+          timers={[timer]}
+          onCancel={vi.fn()}
+        />
+      </TimersProviderMock>,
+    );
+
+    expect(screen.getByRole("spinbutton", { name: "Amount" })).toHaveValue(3);
+    expect(screen.getByRole("combobox", { name: "Unit" })).toHaveValue("weeks");
+  });
 });
 
 describe("TimerForm error handling", () => {
@@ -192,7 +252,7 @@ describe("TimerForm error handling", () => {
     expect(screen.getByRole("alert")).toHaveTextContent("Enter a timer name.");
   });
 
-  it("shows an error if a countdown duration is not positive whole seconds", () => {
+  it("shows an error if a countdown duration is not a positive whole number", () => {
     const setIsAddingTimer = vi.fn();
     renderWithProp(setIsAddingTimer);
 
@@ -203,12 +263,9 @@ describe("TimerForm error handling", () => {
     fireEvent.change(screen.getByRole("textbox", { name: "Timer Name:" }), {
       target: { value: "Medication" },
     });
-    fireEvent.change(
-      screen.getByRole("spinbutton", { name: "Duration (seconds):" }),
-      {
-        target: { value: "0" },
-      },
-    );
+    fireEvent.change(screen.getByRole("spinbutton", { name: "Amount" }), {
+      target: { value: "0" },
+    });
 
     const form = addBtn.closest("form");
     if (!form) {

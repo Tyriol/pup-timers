@@ -1,5 +1,11 @@
 import React, { useState, useContext, useEffect, useRef } from "react";
 import { TimersContext } from "../../context/Context";
+import {
+  convertDurationToSeconds,
+  getDurationInputFromSeconds,
+  isDurationUnit,
+  type DurationUnit,
+} from "../../lib/timers";
 import type { Timer, NewTimer } from "../../types/types";
 
 interface TimerFormProps {
@@ -12,6 +18,8 @@ const TimerForm = ({ editingTimerId, timers, onCancel }: TimerFormProps) => {
   const [timerType, setTimerType] = useState<Timer["type"]>("stopwatch");
   const [timerName, setTimerName] = useState("");
   const [timerDuration, setTimerDuration] = useState("");
+  const [timerDurationUnit, setTimerDurationUnit] =
+    useState<DurationUnit>("minutes");
   const headingRef = useRef<HTMLHeadingElement>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [formError, setFormError] = useState("");
@@ -31,18 +39,30 @@ const TimerForm = ({ editingTimerId, timers, onCancel }: TimerFormProps) => {
     if (timerToEdit) {
       setTimerName(timerToEdit.name);
       setTimerType(timerToEdit.type);
-      setTimerDuration(timerToEdit.duration?.toString() ?? "");
+      if (timerToEdit.duration !== undefined) {
+        const durationInput = getDurationInputFromSeconds(timerToEdit.duration);
+        setTimerDuration(durationInput.duration.toString());
+        setTimerDurationUnit(durationInput.unit);
+      } else {
+        setTimerDuration("");
+        setTimerDurationUnit("minutes");
+      }
     } else {
       setTimerName("");
       setTimerType("stopwatch");
       setTimerDuration("");
+      setTimerDurationUnit("minutes");
     }
   }, [timerToEdit]);
 
   const handleSubmitTimer = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isSaving) return;
-    const duration = Number(timerDuration);
+    const durationAmount = Number(timerDuration);
+    const duration = convertDurationToSeconds(
+      durationAmount,
+      timerDurationUnit,
+    );
     const name = timerName.trim();
 
     if (!name) {
@@ -52,7 +72,9 @@ const TimerForm = ({ editingTimerId, timers, onCancel }: TimerFormProps) => {
 
     if (
       timerType === "countdown" &&
-      (!Number.isInteger(duration) || duration <= 0)
+      (!Number.isInteger(durationAmount) ||
+        durationAmount <= 0 ||
+        !Number.isSafeInteger(duration))
     ) {
       setFormError("Enter a whole-number duration greater than zero.");
       return;
@@ -158,23 +180,48 @@ const TimerForm = ({ editingTimerId, timers, onCancel }: TimerFormProps) => {
               : "Counts down from your chosen duration."}
           </p>
           {timerType === "countdown" ? (
-            <label className="form-label">
-              Duration (seconds):
-              <input
-                className="text-input"
-                name="duration"
-                type="number"
-                inputMode="numeric"
-                min="1"
-                step="1"
-                value={timerDuration}
-                onChange={(e) => {
-                  setTimerDuration(e.target.value);
-                  setFormError("");
-                }}
-                required
-              />
-            </label>
+            <fieldset className="duration-fields">
+              <legend>Duration</legend>
+              <label className="form-label">
+                Amount
+                <input
+                  className="text-input"
+                  name="duration"
+                  type="number"
+                  inputMode="numeric"
+                  min="1"
+                  step="1"
+                  value={timerDuration}
+                  onChange={(e) => {
+                    setTimerDuration(e.target.value);
+                    setFormError("");
+                  }}
+                  required
+                />
+              </label>
+              <label className="form-label">
+                Unit
+                <select
+                  className="text-input"
+                  name="durationUnit"
+                  value={timerDurationUnit}
+                  onChange={(e) => {
+                    if (isDurationUnit(e.target.value)) {
+                      setTimerDurationUnit(e.target.value);
+                    }
+                    setFormError("");
+                  }}
+                >
+                  <option value="seconds">Seconds</option>
+                  <option value="minutes">Minutes</option>
+                  <option value="hours">Hours</option>
+                  <option value="days">Days</option>
+                  <option value="weeks">Weeks</option>
+                  <option value="months">Months</option>
+                </select>
+              </label>
+              <p className="muted duration-hint">1 month equals 30 days.</p>
+            </fieldset>
           ) : null}
         </fieldset>
         {formError ? <p role="alert">{formError}</p> : null}
